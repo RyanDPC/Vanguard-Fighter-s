@@ -10,8 +10,7 @@ namespace My2DGame
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private Texture2D playerTexture;
-        private Vector2 playerPosition;
+       
 
         private Texture2D projectileTexture;
         private List<Shoot> shoots;
