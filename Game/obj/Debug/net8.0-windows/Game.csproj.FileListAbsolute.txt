@@ -60,3 +60,12 @@ C:\Users\pa70iyc\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windo
 C:\Users\pa70iyc\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.dll
 C:\Users\pa70iyc\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\refint\Game.dll
 C:\Users\pa70iyc\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.pdb
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.csproj.AssemblyReference.cache
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.AssemblyInfoInputs.cache
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.AssemblyInfo.cs
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.csproj.CoreCompileInputs.cache
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.sourcelink.json
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.dll
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\refint\Game.dll
+C:\Users\ChinoLaoy\Documents\GitHub\Vanguard-Fighter-s\Game\obj\Debug\net8.0-windows\Game.pdb
