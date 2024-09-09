@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|c:\\users\\chinolaoy\\documents\\github\\vanguard-fighter-s\\game\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|solutionrelative:game\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|c:\\users\\chinolaoy\\documents\\github\\vanguard-fighter-s\\game\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|solutionrelative:game\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|c:\\users\\chinolaoy\\documents\\github\\vanguard-fighter-s\\game\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|solutionrelative:game\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,29 +18,30 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Game1.cs",
               "DocumentMoniker": "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game1.cs",
               "RelativeDocumentMoniker": "Game\\Game1.cs",
               "ToolTip": "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game1.cs",
               "RelativeToolTip": "Game\\Game1.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAACMAAAAAAAAA",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-06T12:45:45.49Z"
+              "WhenOpened": "2024-09-06T12:45:45.49Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Player.cs",
               "DocumentMoniker": "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Models\\Player.cs",
               "RelativeDocumentMoniker": "Game\\Models\\Player.cs",
               "ToolTip": "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Models\\Player.cs",
               "RelativeToolTip": "Game\\Models\\Player.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-06T12:40:19.641Z",
               "EditorCaption": ""
