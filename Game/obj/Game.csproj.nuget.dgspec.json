@@ -1,23 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj": {}
+    "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj": {
+    "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj",
+        "projectUniqueName": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj",
         "projectName": "Game",
-        "projectPath": "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj",
-        "packagesPath": "C:\\Users\\ChinoLaoy\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ChinoLaoy\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\obj\\",
+        "projectPath": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj",
+        "packagesPath": "C:\\Users\\pa70iyc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\ChinoLaoy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\pa70iyc\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -78,7 +79,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
