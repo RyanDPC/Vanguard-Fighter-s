@@ -59,6 +59,14 @@
               "target": "Package",
               "version": "[4.0.2, )"
             },
+            "MonoGame.Extended.Content.Pipeline": {
+              "target": "Package",
+              "version": "[4.0.2, )"
+            },
+            "MonoGame.Framework.Content.Pipeline": {
+              "target": "Package",
+              "version": "[3.8.2.1105, )"
+            },
             "MonoGame.Framework.DesktopGL": {
               "target": "Package",
               "version": "[3.8.2.1105, )"

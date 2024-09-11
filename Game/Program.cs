@@ -1,3 +1,4 @@
-﻿
-using var game = new Game.Game1();
-game.Run();
+﻿using (var game = new Game1())
+{
+    game.Run();
+}
