@@ -1,11 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "chpMXkTo8FNq8WYjOlpRxONkSj0E+MJFukX/iJNlTbG2s4vHD+mfe9fnaEgZjX/vXBWqngtEJFS3CWO/H8nFgg==",
+  "dgSpecHash": "DwNwy6n4F4JIUDkyGfkzbc5VIZJKmmVqZXb/P5W49Sw6CFaim72+UqYG47IClLD2OZ2FKCBrSFQOdzvbvxPWfQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\pa70iyc\\.nuget\\packages\\monogame.content.builder.task\\3.8.1.303\\monogame.content.builder.task.3.8.1.303.nupkg.sha512",
-    "C:\\Users\\pa70iyc\\.nuget\\packages\\monogame.framework.desktopgl\\3.8.1.303\\monogame.framework.desktopgl.3.8.1.303.nupkg.sha512"
+    "C:\\Users\\pa70iyc\\.nuget\\packages\\monogame.content.builder.task\\3.8.2.1105\\monogame.content.builder.task.3.8.2.1105.nupkg.sha512",
+    "C:\\Users\\pa70iyc\\.nuget\\packages\\monogame.extended\\4.0.2\\monogame.extended.4.0.2.nupkg.sha512",
+    "C:\\Users\\pa70iyc\\.nuget\\packages\\monogame.framework.desktopgl\\3.8.2.1105\\monogame.framework.desktopgl.3.8.2.1105.nupkg.sha512",
+    "C:\\Users\\pa70iyc\\.nuget\\packages\\monogame.library.sdl\\2.26.5.5\\monogame.library.sdl.2.26.5.5.nupkg.sha512",
+    "C:\\Users\\pa70iyc\\.nuget\\packages\\nvorbis\\0.10.4\\nvorbis.0.10.4.nupkg.sha512",
+    "C:\\Users\\pa70iyc\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512"
   ],
   "logs": []
 }
