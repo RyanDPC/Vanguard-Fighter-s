@@ -7,7 +7,7 @@ namespace My2DGame
         [STAThread]
         static void Main()
         {
-            using var game = new Game1();
+            using var game = new Microsoft.Xna.Framework.Game();
             game.Run();
         }
     }

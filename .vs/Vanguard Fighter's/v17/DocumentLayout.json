@@ -3,7 +3,11 @@
   "WorkspaceRootPath": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|c:\\users\\pa70iyc\\documents\\github\\vanguard-fighter-s\\game\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|c:\\users\\pa70iyc\\documents\\github\\vanguard-fighter-s\\game\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|solutionrelative:game\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\game\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B1271B30-D5AF-47BF-BD1C-545A20D71008}|Game\\Game.csproj|solutionrelative:game\\game1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -23,19 +27,31 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Game1.cs",
-              "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game1.cs",
-              "RelativeDocumentMoniker": "Game\\Game1.cs",
-              "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game1.cs*",
-              "RelativeToolTip": "Game\\Game1.cs*",
-              "ViewState": "AQIAAEoAAAAAAAAAAAAYwHUAAAAAAAAA",
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Program.cs",
+              "RelativeDocumentMoniker": "Game\\Program.cs",
+              "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Program.cs",
+              "RelativeToolTip": "Game\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAABAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-06T12:45:45.49Z",
+              "WhenOpened": "2024-09-11T11:15:56.296Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Game1.cs",
+              "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game1.cs",
+              "RelativeDocumentMoniker": "Game\\Game1.cs",
+              "ToolTip": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Game1.cs",
+              "RelativeToolTip": "Game\\Game1.cs",
+              "ViewState": "AQIAAC0AAAAAAAAAAAAiwHUAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-06T12:45:45.49Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Player.cs",
               "DocumentMoniker": "C:\\Users\\pa70iyc\\Documents\\GitHub\\Vanguard-Fighter-s\\Game\\Models\\Player.cs",
               "RelativeDocumentMoniker": "Game\\Models\\Player.cs",
