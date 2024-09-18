@@ -12,10 +12,16 @@ namespace MyGame.Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private int screenWidth;
+
         private Map _map;
         private Player player;
         private Enemy enemy;
         private InputManager inputManager;
+        private int screenHeight;
+        private int mapWidthInPixels;
+        private int mapHeightInPixels;
+
 
         public Game1()
         {
@@ -34,11 +40,18 @@ namespace MyGame.Game
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Charger les cartes Tiled et leurs fonds associés
+        screenWidth = _graphics.PreferredBackBufferWidth;
+        screenHeight = _graphics.PreferredBackBufferHeight;
+             // Charger les cartes Tiled et leurs fonds associés
             List<TiledMap> maps = new List<TiledMap>
             {
                 Content.Load<TiledMap>("Textures/TheForest")
             };
+
+            // Obtenir les dimensions de la carte
+            TiledMap currentMap = maps[0];
+            mapWidthInPixels = currentMap.Width * currentMap.TileWidth;    // Largeur de la carte en pixels
+            mapHeightInPixels = currentMap.Height * currentMap.TileHeight; // Hauteur de la carte en pixels
 
             List<Texture2D> backgrounds = new List<Texture2D>
             {
@@ -56,7 +69,7 @@ namespace MyGame.Game
                 (GraphicsDevice.PresentationParameters.BackBufferWidth - 64) / 2,
                 GraphicsDevice.PresentationParameters.BackBufferHeight - 128
             );
-            player = new Player(playerTexture, playerInitialPosition);
+            player = new Player(playerTexture, playerInitialPosition, screenWidth, screenHeight, mapWidthInPixels, mapHeightInPixels);
 
             // Charger et initialiser l'ennemi
             Texture2D enemyTexture = Content.Load<Texture2D>("Players/WukongEntier");

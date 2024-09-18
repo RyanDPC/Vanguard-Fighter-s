@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
@@ -8,6 +9,7 @@ namespace MyGame.Models
     public class Player
     {
         public Vector2 Position { get; private set; }
+        public Color Colour = Color.White;
         private Vector2 _velocity;
         private Texture2D _texture;
         private bool isOnGround = false;
@@ -15,11 +17,15 @@ namespace MyGame.Models
         private float jumpStrength = -600f; // Force du saut
         private const int PlayerWidth = 64;
         private const int PlayerHeight = 128;
-
-        public Player(Texture2D texture, Vector2 initialPosition)
+        private int screenWidth;
+        private int screenHeight;
+        // Constructeur modifié pour inclure la taille de l'écran
+        public Player(Texture2D texture, Vector2 initialPosition, int screenWidth, int screenHeight, int mapWidth, int mapHeight)
         {
             _texture = texture;
             Position = initialPosition;
+            this.screenWidth = screenWidth;
+            this.screenHeight = screenHeight;
         }
 
         public void Update(GameTime gameTime, InputManager inputManager, TiledMap map)
@@ -28,6 +34,7 @@ namespace MyGame.Models
             HandleInput(inputManager);
             CheckCollisions(map);
             UpdatePosition(gameTime);
+            PreventLeavingScreen(); // Nouvelle méthode pour empêcher de quitter l'écran
         }
 
         private void ApplyGravity(GameTime gameTime)
@@ -79,6 +86,30 @@ namespace MyGame.Models
             }
         }
 
+        private void PreventLeavingScreen()
+        {
+            
+            // Empêcher le joueur de dépasser les bords de l'écran
+            if (Position.X < 0)
+            {
+                Position = new Vector2(0, Position.Y); // Bord gauche de l'écran
+            }
+            else if (Position.X + PlayerWidth > screenWidth)
+            {
+                Position = new Vector2(screenWidth - PlayerWidth, Position.Y); // Bord droit de l'écran
+            }
+
+            if (Position.Y + PlayerHeight > screenHeight)
+            {
+                Position = new Vector2(Position.X, screenHeight - PlayerHeight); // Bord bas de l'écran
+                _velocity.Y = 0; // Stopper la chute
+                isOnGround = true; // Le joueur est au sol
+            }
+            if (Position.Y < 0){
+                Position = new Vector2(Position.X, 0);
+            }
+        }
+
         private void UpdatePosition(GameTime gameTime)
         {
             Position += _velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -86,8 +117,8 @@ namespace MyGame.Models
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            Rectangle destinationRectangle = new Rectangle((int)Position.X, (int)Position.Y, PlayerWidth, PlayerHeight);
-            spriteBatch.Draw(_texture, destinationRectangle, Color.White);
+            Rectangle Positions = new Rectangle((int)Position.X, (int)Position.Y, PlayerWidth, PlayerHeight);
+            spriteBatch.Draw(_texture, Positions, Colour);
         }
     }
 }
