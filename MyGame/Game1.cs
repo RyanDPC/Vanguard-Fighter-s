@@ -64,6 +64,12 @@ namespace MyGame.Game
 
             // Charger la texture du joueur
             Texture2D playerTexture = Content.Load<Texture2D>("Players/SpecialistFace");
+            
+            Texture2D weaponTexture = Content.Load<Texture2D>("Weapons/Ion Rifle");
+            weapon = new Weapon("Rifle", 30, 5f, 10, 2f, "Automatic fire"); // Example weapon
+            weapon.SetWeaponTexture(weaponTexture);
+            weapon.Size = new Vector2(64, 32);
+
 
             // Obtenir les dimensions de la carte
             mapWidthInPixels = currentMap.WidthInPixels;    // Utiliser WidthInPixels et HeightInPixels de MonoGame.Extended

@@ -4,7 +4,7 @@ using MyGame.Models;
 
 namespace MyGame.Content.Weapons
 {
-    public class WeaponsLibrary
+    public class WeaponLibrary
     {
         public Weapon AdvancedAssaultRifle { get; private set; }
         public Weapon CompactSidearm { get; private set; }
@@ -16,17 +16,17 @@ namespace MyGame.Content.Weapons
         public Weapon StealthHandgun { get; private set; }
         public Weapon TacticalPistol { get; private set; }
 
-        public WeaponsLibrary()
+        public WeaponLibrary()
         {
-            // Initialisation des armes avec leurs spécifications
+            // Initialization of weapons with their specifications
 
             AdvancedAssaultRifle = new Weapon(
                 "Advanced Assault Rifle",
-                35,     // Dégâts
-                10f,    // Cadence de tir (tirs par seconde)
-                30,     // Capacité de munitions
-                800f,   // Portée en pixels
-                "Rafale automatique avec une légère perte de précision" // Capacité spéciale
+                35,     // Damage
+                10f,    // Fire rate (shots per second)
+                30,     // Ammo capacity
+                800f,   // Range in pixels
+                "Automatic burst with slight accuracy loss" // Special ability
             );
 
             CompactSidearm = new Weapon(
@@ -35,7 +35,7 @@ namespace MyGame.Content.Weapons
                 5f,
                 12,
                 400f,
-                "Recharge rapide"
+                "Fast reload"
             );
 
             EnergyRifle = new Weapon(
@@ -44,7 +44,7 @@ namespace MyGame.Content.Weapons
                 6f,
                 20,
                 1000f,
-                "Tir explosif tous les 5 tirs"
+                "Explosive shot every 5 shots"
             );
 
             FuturisticPistol = new Weapon(
@@ -53,7 +53,7 @@ namespace MyGame.Content.Weapons
                 4f,
                 10,
                 500f,
-                "Surchauffe après 5 tirs avec dégâts accrus"
+                "Overheats after 5 shots with increased damage"
             );
 
             IonRifle = new Weapon(
@@ -62,7 +62,7 @@ namespace MyGame.Content.Weapons
                 7f,
                 25,
                 900f,
-                "Désactive temporairement les boucliers ennemis"
+                "Temporarily disables enemy shields"
             );
 
             PlasmaBlaster = new Weapon(
@@ -71,7 +71,7 @@ namespace MyGame.Content.Weapons
                 2f,
                 8,
                 600f,
-                "Explosion retardée infligeant des dégâts de zone"
+                "Delayed explosion causing area damage"
             );
 
             SciFiShotgun = new Weapon(
@@ -80,7 +80,7 @@ namespace MyGame.Content.Weapons
                 1.5f,
                 6,
                 300f,
-                "Impulsion repoussant les ennemis proches"
+                "Impulse that pushes nearby enemies"
             );
 
             StealthHandgun = new Weapon(
@@ -89,7 +89,7 @@ namespace MyGame.Content.Weapons
                 3f,
                 9,
                 200f,
-                "Tir silencieux sans révéler la position"
+                "Silent shot without revealing position"
             );
 
             TacticalPistol = new Weapon(
@@ -98,11 +98,11 @@ namespace MyGame.Content.Weapons
                 3f,
                 10,
                 600f,
-                "Mode tir précis avec portée accrue"
+                "Precision mode with extended range"
             );
         }
 
-        // Méthode pour tester les armes
+        // Method to test the weapons
         public void TestWeapons()
         {
             AdvancedAssaultRifle.Shoot();
@@ -113,12 +113,13 @@ namespace MyGame.Content.Weapons
             CompactSidearm.Reload();
             CompactSidearm.UseSpecialAbility();
 
-            // Testez les autres armes ici de manière similaire
+            // Test other weapons similarly
         }
 
-         public void SetWeaponTextures(Texture2D rifleTexture, Texture2D pistolTexture)
+        // Method to assign textures to weapons
+        public void SetWeaponTextures(Texture2D rifleTexture, Texture2D pistolTexture)
         {
-            // Assigner les textures aux armes correspondantes
+            // Assign textures to corresponding weapons
             AdvancedAssaultRifle.SetWeaponTexture(rifleTexture);
             IonRifle.SetWeaponTexture(rifleTexture);
             PlasmaBlaster.SetWeaponTexture(rifleTexture);

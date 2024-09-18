@@ -15,6 +15,7 @@ namespace MyGame.Models
         private Vector2 _velocity;
         private Texture2D _texture;
         private bool isOnGround = false;
+        private bool _isFacingRight = true; // Le joueur fait face à la droite par défaut
         private float gravity = 1500f;
         private float jumpStrength = -600f; // Force du saut
         private const int PlayerWidth = 64;
@@ -22,14 +23,15 @@ namespace MyGame.Models
         private int _screenWidth;
         private int _screenHeight;
         private Weapon _currentWeapon; // L'arme actuelle du joueur
-        private Vector2 _weaponOffset = new Vector2(30, 50);
+        private Vector2 _weaponOffset = new Vector2(30, 50); // Position de l'arme par rapport au joueur
+
         public Player(ContentManager content, Texture2D texture, Vector2 initialPosition, int screenWidth, int screenHeight, int mapWidth, int mapHeight, Weapon weapon)
         {
             Position = initialPosition;
             this._texture = texture;
             this._screenWidth = screenWidth;
             this._screenHeight = screenHeight;
-             _currentWeapon = weapon;
+            _currentWeapon = weapon;
         }
 
         public void Update(GameTime gameTime, InputManager inputManager, TiledMap map)
@@ -39,7 +41,10 @@ namespace MyGame.Models
             CheckCollisions(map);
             UpdatePosition(gameTime);
             PreventLeavingScreen();
-           
+
+            // Mise à jour de l'arme en fonction de la position de la souris
+            Vector2 mousePosition = inputManager.GetMousePosition();
+            UpdateWeapon(mousePosition);
         }
 
         private void ApplyGravity(GameTime gameTime)
@@ -97,19 +102,27 @@ namespace MyGame.Models
         {
             Position += _velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
-private void UpdateWeapon(Vector2 mousePosition)
+
+        private void UpdateWeapon(Vector2 mousePosition)
         {
             // Calculer l'angle entre le joueur et la souris
             Vector2 direction = mousePosition - (Position + _weaponOffset);
             float angle = (float)Math.Atan2(direction.Y, direction.X);
+            _isFacingRight = mousePosition.X > Position.X;
 
-            // Définir la position et la rotation de l'arme
-            _currentWeapon.SetRotation(angle);
+            // Définir la rotation de l'arme
+            _currentWeapon.SetRotation(angle, _isFacingRight);
         }
+
         public void Draw(SpriteBatch spriteBatch)
         {
+            // Dessiner le joueur
             Rectangle destinationRectangle = new Rectangle((int)Position.X, (int)Position.Y, PlayerWidth, PlayerHeight);
             spriteBatch.Draw(_texture, destinationRectangle, Colour);
+
+            // Dessiner l'arme dans la main du joueur
+            Vector2 weaponPosition = Position + _weaponOffset; // Ajuster la position de l'arme
+            _currentWeapon.Draw(spriteBatch, weaponPosition);
         }
     }
 }
