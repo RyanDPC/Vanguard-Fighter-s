@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "C#: <project-name> Debug",
+            "name": "C#: MyGame Debug",
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}/MyGame.csproj"
