@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
@@ -12,69 +13,87 @@ namespace MyGame.Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private int screenWidth;
-
-        private Map _map;
+        private TiledMapRenderer _mapRenderer;
         private Player player;
         private Enemy enemy;
         private InputManager inputManager;
+        private List<TiledMap> maps; // Utiliser TiledMap de MonoGame.Extended
+        private List<Texture2D> backgrounds;
+        private Texture2D currentBackground;
+        private TiledMap currentMap; // Utiliser TiledMap de MonoGame.Extended
+        private Weapon weapon;
         private int screenHeight;
         private int mapWidthInPixels;
         private int mapHeightInPixels;
-
+        private int screenWidth;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            backgrounds = new List<Texture2D>();
+            maps = new List<TiledMap>(); // Modifier pour utiliser TiledMap de MonoGame.Extended
 
             _graphics.PreferredBackBufferWidth = 1920;
             _graphics.PreferredBackBufferHeight = 1080;
             _graphics.ApplyChanges();
-
-            inputManager = new InputManager();
         }
 
         protected override void LoadContent()
         {
+            inputManager = new InputManager();
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        screenWidth = _graphics.PreferredBackBufferWidth;
-        screenHeight = _graphics.PreferredBackBufferHeight;
-             // Charger les cartes Tiled et leurs fonds associés
-            List<TiledMap> maps = new List<TiledMap>
+            screenWidth = _graphics.PreferredBackBufferWidth;
+            screenHeight = _graphics.PreferredBackBufferHeight;
+
+            // Charger le background et la carte avec MonoGame.Extended
+            backgrounds.Add(Content.Load<Texture2D>("Maps/Background"));
+            maps.Add(Content.Load<TiledMap>("Textures/TheForest")); // Charger la carte avec MonoGame.Extended
+
+            if (backgrounds.Count > 0 && maps.Count > 0)
             {
-                Content.Load<TiledMap>("Textures/TheForest")
-            };
+                // Assembler le premier background et la première map
+                currentBackground = backgrounds[0];
+                currentMap = maps[0];
 
-            // Obtenir les dimensions de la carte
-            TiledMap currentMap = maps[0];
-            mapWidthInPixels = currentMap.Width * currentMap.TileWidth;    // Largeur de la carte en pixels
-            mapHeightInPixels = currentMap.Height * currentMap.TileHeight; // Hauteur de la carte en pixels
-
-            List<Texture2D> backgrounds = new List<Texture2D>
-            {
-                Content.Load<Texture2D>("Maps/Background")  // Associer le fond avec la carte Tiled
-            };
-
-            // Initialiser la carte avec le fond associé
-            _map = new Map(GraphicsDevice, maps, backgrounds);
+                // Initialiser le renderer de la carte
+                _mapRenderer = new TiledMapRenderer(GraphicsDevice, currentMap);
+            }
 
             // Charger la texture du joueur
             Texture2D playerTexture = Content.Load<Texture2D>("Players/SpecialistFace");
+
+            // Obtenir les dimensions de la carte
+            mapWidthInPixels = currentMap.WidthInPixels;    // Utiliser WidthInPixels et HeightInPixels de MonoGame.Extended
+            mapHeightInPixels = currentMap.HeightInPixels;
 
             // Initialiser le joueur
             Vector2 playerInitialPosition = new Vector2(
                 (GraphicsDevice.PresentationParameters.BackBufferWidth - 64) / 2,
                 GraphicsDevice.PresentationParameters.BackBufferHeight - 128
             );
-            player = new Player(playerTexture, playerInitialPosition, screenWidth, screenHeight, mapWidthInPixels, mapHeightInPixels);
+            player = new Player(Content, playerTexture, playerInitialPosition, screenWidth, screenHeight, mapWidthInPixels, mapHeightInPixels, weapon);
 
             // Charger et initialiser l'ennemi
             Texture2D enemyTexture = Content.Load<Texture2D>("Players/WukongEntier");
             Vector2 enemyInitialPosition = new Vector2(500, 100);
             enemy = new Enemy(enemyTexture, enemyInitialPosition);
+        }
+
+        private void LoadMap(int mapIndex)
+        {
+            // Charger la carte actuelle
+            currentMap = maps[mapIndex];
+            _mapRenderer = new TiledMapRenderer(GraphicsDevice, currentMap);
+
+            // Obtenir les dimensions de la carte
+            mapWidthInPixels = currentMap.WidthInPixels;
+            mapHeightInPixels = currentMap.HeightInPixels;
+
+            // Charger le fond associé (si nécessaire)
+            currentBackground = backgrounds[mapIndex];
         }
 
         protected override void Update(GameTime gameTime)
@@ -88,13 +107,13 @@ namespace MyGame.Game
             }
 
             // Mettre à jour la carte
-            _map.Update(gameTime);
+            _mapRenderer.Update(gameTime);
 
             // Mettre à jour le joueur
-            player.Update(gameTime, inputManager, _map.GetCurrentTiledMap());
+            player.Update(gameTime, inputManager, currentMap);
 
             // Mettre à jour l'ennemi
-            enemy.MoveTowardsPlayer(player.Position, gameTime, GraphicsDevice, _map.GetCurrentTiledMap());
+            enemy.MoveTowardsPlayer(player.Position, gameTime, GraphicsDevice, currentMap);
 
             base.Update(gameTime);
         }
@@ -103,8 +122,18 @@ namespace MyGame.Game
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // Dessiner la carte et le fond
-            _map.Draw(_spriteBatch);
+            _spriteBatch.Begin();
+
+            // Dessiner le background
+            if (currentBackground != null)
+            {
+                _spriteBatch.Draw(currentBackground, Vector2.Zero, Color.White);
+            }
+
+            _spriteBatch.End();
+
+            // Dessiner la carte
+            _mapRenderer.Draw();
 
             _spriteBatch.Begin();
 

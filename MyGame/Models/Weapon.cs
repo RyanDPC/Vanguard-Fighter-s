@@ -16,8 +16,7 @@ namespace MyGame.Models
         private float reloadTimer;
         private Texture2D _weaponTexture;
 
-        // Capacité spéciale
-        public string SpecialAbility { get; private set; }
+        private float _rotation; // Rotation de l'arme
 
         public Weapon(string name, int maxAmmo, float fireRate, int ammoCapacity, float reloadTime, string specialAbility)
         {
@@ -25,7 +24,6 @@ namespace MyGame.Models
             MaxAmmo = ammoCapacity;
             FireRate = fireRate;
             ReloadTime = reloadTime;
-            SpecialAbility = specialAbility;
             CurrentAmmo = MaxAmmo;
             IsReloading = false;
             timeSinceLastShot = 0;
@@ -49,19 +47,16 @@ namespace MyGame.Models
                 timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
         }
-
-        public bool CanShoot()
+ public bool CanShoot()
         {
             return !IsReloading && CurrentAmmo > 0 && timeSinceLastShot >= (1 / FireRate);
         }
-
         public void Shoot()
         {
             if (CanShoot())
             {
                 CurrentAmmo--;
                 timeSinceLastShot = 0;
-                // Code pour jouer le bruit de tir ou créer un projectile
                 Console.WriteLine($"{Name} tire, munitions restantes : {CurrentAmmo}");
             }
         }
@@ -76,28 +71,27 @@ namespace MyGame.Models
             }
         }
 
-        public void UseSpecialAbility()
+        public void SetRotation(float rotation)
         {
-            Console.WriteLine($"{Name} utilise sa capacité spéciale : {SpecialAbility}");
+            _rotation = rotation;
         }
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position)
         {
-    // Définir les dimensions souhaitées pour l'arme
-    int weaponWidth = _weaponTexture.Width / 4; // Réduire la largeur de l'arme
-    int weaponHeight = _weaponTexture.Height / 4; // Réduire la hauteur de l'arme
-    Rectangle destinationRectangle = new Rectangle((int)position.X, (int)position.Y, weaponWidth, weaponHeight);
-    spriteBatch.Draw(_weaponTexture, destinationRectangle, Color.White);
+            // Définir les dimensions souhaitées pour l'arme
+            int weaponWidth = _weaponTexture.Width / 4; 
+            int weaponHeight = _weaponTexture.Height / 4;
+            Rectangle destinationRectangle = new Rectangle((int)position.X, (int)position.Y, weaponWidth, weaponHeight);
 
+            // Dessiner l'arme avec rotation
+            spriteBatch.Draw(_weaponTexture, destinationRectangle, null, Color.White, _rotation, new Vector2(weaponWidth / 2, weaponHeight / 2), SpriteEffects.None, 0f);
         }
 
         public void SetWeaponTexture(Texture2D texture)
         {
             _weaponTexture = texture;
         }
+
+       
     }
 }
-
-
-
-

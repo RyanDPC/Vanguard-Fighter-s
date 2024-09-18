@@ -1,7 +1,9 @@
-using System.Security.Cryptography.X509Certificates;
+using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
+using MyGame.Game;
 using MyGame.Services;
 
 namespace MyGame.Models
@@ -17,15 +19,17 @@ namespace MyGame.Models
         private float jumpStrength = -600f; // Force du saut
         private const int PlayerWidth = 64;
         private const int PlayerHeight = 128;
-        private int screenWidth;
-        private int screenHeight;
-        // Constructeur modifié pour inclure la taille de l'écran
-        public Player(Texture2D texture, Vector2 initialPosition, int screenWidth, int screenHeight, int mapWidth, int mapHeight)
+        private int _screenWidth;
+        private int _screenHeight;
+        private Weapon _currentWeapon; // L'arme actuelle du joueur
+        private Vector2 _weaponOffset = new Vector2(30, 50);
+        public Player(ContentManager content, Texture2D texture, Vector2 initialPosition, int screenWidth, int screenHeight, int mapWidth, int mapHeight, Weapon weapon)
         {
-            _texture = texture;
             Position = initialPosition;
-            this.screenWidth = screenWidth;
-            this.screenHeight = screenHeight;
+            this._texture = texture;
+            this._screenWidth = screenWidth;
+            this._screenHeight = screenHeight;
+             _currentWeapon = weapon;
         }
 
         public void Update(GameTime gameTime, InputManager inputManager, TiledMap map)
@@ -34,7 +38,8 @@ namespace MyGame.Models
             HandleInput(inputManager);
             CheckCollisions(map);
             UpdatePosition(gameTime);
-            PreventLeavingScreen(); // Nouvelle méthode pour empêcher de quitter l'écran
+            PreventLeavingScreen();
+           
         }
 
         private void ApplyGravity(GameTime gameTime)
@@ -59,27 +64,21 @@ namespace MyGame.Models
 
         private void CheckCollisions(TiledMap map)
         {
-            // Gérer les collisions avec les tuiles du niveau
             isOnGround = false;
-
             Rectangle playerRect = new Rectangle((int)Position.X, (int)(Position.Y + _velocity.Y), PlayerWidth, PlayerHeight);
 
             foreach (var layer in map.TileLayers)
             {
                 foreach (var tile in layer.Tiles)
                 {
-                    if (tile.GlobalIdentifier != 0) // Si ce n'est pas une tuile vide
+                    if (tile.GlobalIdentifier != 0)
                     {
                         Rectangle tileRect = new Rectangle(tile.X * map.TileWidth, tile.Y * map.TileHeight, map.TileWidth, map.TileHeight);
-
-                        if (playerRect.Intersects(tileRect))
+                        if (playerRect.Intersects(tileRect) && _velocity.Y > 0)
                         {
-                            if (_velocity.Y > 0) // Si le joueur tombe
-                            {
-                                Position = new Vector2(Position.X, tileRect.Top - PlayerHeight);
-                                _velocity.Y = 0;
-                                isOnGround = true;
-                            }
+                            Position = new Vector2(Position.X, tileRect.Top - PlayerHeight);
+                            _velocity.Y = 0;
+                            isOnGround = true;
                         }
                     }
                 }
@@ -88,37 +87,29 @@ namespace MyGame.Models
 
         private void PreventLeavingScreen()
         {
-            
-            // Empêcher le joueur de dépasser les bords de l'écran
-            if (Position.X < 0)
-            {
-                Position = new Vector2(0, Position.Y); // Bord gauche de l'écran
-            }
-            else if (Position.X + PlayerWidth > screenWidth)
-            {
-                Position = new Vector2(screenWidth - PlayerWidth, Position.Y); // Bord droit de l'écran
-            }
-
-            if (Position.Y + PlayerHeight > screenHeight)
-            {
-                Position = new Vector2(Position.X, screenHeight - PlayerHeight); // Bord bas de l'écran
-                _velocity.Y = 0; // Stopper la chute
-                isOnGround = true; // Le joueur est au sol
-            }
-            if (Position.Y < 0){
-                Position = new Vector2(Position.X, 0);
-            }
+            if (Position.X < 0) Position = new Vector2(0, Position.Y);
+            else if (Position.X + PlayerWidth > _screenWidth) Position = new Vector2(_screenWidth - PlayerWidth, Position.Y);
+            if (Position.Y + PlayerHeight > _screenHeight) Position = new Vector2(Position.X, _screenHeight - PlayerHeight);
+            if (Position.Y < 0) Position = new Vector2(Position.X, 0);
         }
 
         private void UpdatePosition(GameTime gameTime)
         {
             Position += _velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
+private void UpdateWeapon(Vector2 mousePosition)
+        {
+            // Calculer l'angle entre le joueur et la souris
+            Vector2 direction = mousePosition - (Position + _weaponOffset);
+            float angle = (float)Math.Atan2(direction.Y, direction.X);
 
+            // Définir la position et la rotation de l'arme
+            _currentWeapon.SetRotation(angle);
+        }
         public void Draw(SpriteBatch spriteBatch)
         {
-            Rectangle Positions = new Rectangle((int)Position.X, (int)Position.Y, PlayerWidth, PlayerHeight);
-            spriteBatch.Draw(_texture, Positions, Colour);
+            Rectangle destinationRectangle = new Rectangle((int)Position.X, (int)Position.Y, PlayerWidth, PlayerHeight);
+            spriteBatch.Draw(_texture, destinationRectangle, Colour);
         }
     }
 }

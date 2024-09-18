@@ -116,9 +116,19 @@ namespace MyGame.Content.Weapons
             // Testez les autres armes ici de manière similaire
         }
 
-        internal void SetWeaponTextures(Texture2D rifleTexture, Texture2D pistolTexture)
+         public void SetWeaponTextures(Texture2D rifleTexture, Texture2D pistolTexture)
         {
-            throw new NotImplementedException();
+            // Assigner les textures aux armes correspondantes
+            AdvancedAssaultRifle.SetWeaponTexture(rifleTexture);
+            IonRifle.SetWeaponTexture(rifleTexture);
+            PlasmaBlaster.SetWeaponTexture(rifleTexture);
+            SciFiShotgun.SetWeaponTexture(rifleTexture);
+            EnergyRifle.SetWeaponTexture(rifleTexture);
+
+            CompactSidearm.SetWeaponTexture(pistolTexture);
+            FuturisticPistol.SetWeaponTexture(pistolTexture);
+            StealthHandgun.SetWeaponTexture(pistolTexture);
+            TacticalPistol.SetWeaponTexture(pistolTexture);
         }
     }
 }
