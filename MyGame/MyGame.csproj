@@ -9,6 +9,7 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +29,7 @@
   <ItemGroup>
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.2.1105" />
     <PackageReference Include="MonoGame.Extended" Version="4.0.2" />
-    <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="4.0.2"/>
+    <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="4.0.2" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105" />
     <PackageReference Include="TiledSharp" Version="1.0.1" />
   </ItemGroup>
@@ -44,6 +45,10 @@
 
     <!-- Commande pour compiler le contenu -->
     <Exec Command="dotnet mgcb /@:&quot;Content/Content.mgcb&quot; /platform:DesktopGL /outputDir:&quot;bin/DesktopGL/Content&quot; /intermediateDir:&quot;obj/DesktopGL/Content&quot; /workingDir:&quot;Content/&quot;" />
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&#xD;&#xA;" />
   </Target>
 
 </Project>
