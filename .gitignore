@@ -18,8 +18,7 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
+[Cc]ontent/
 [Rr]elease/
 [Rr]eleases/
 x64/
@@ -34,8 +33,6 @@ DesktopGL/
 [Ll]ogs/
 
 #Forced to get the file
-git add -f bin/Debug/net8.0/MyGame.exe
-git add -f bin/Debug/net8.0/MyGame.dll
 git add -f bin/Debug/net8.0/MonoGame.Extended.Content.Pipeline.dll
 git add -f bin/Debug/net8.0/MonoGame.Extended.dll
 
