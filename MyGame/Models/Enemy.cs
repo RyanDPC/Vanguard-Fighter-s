@@ -1,6 +1,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyGame.Models
 {
@@ -9,6 +12,9 @@ namespace MyGame.Models
         private Texture2D _texture;
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; } = Vector2.Zero;
+        public int Health { get; set; } = 5;
+        public bool IsAlive => Health > 0;
+
         private float speed = 150.0f; // Vitesse de l'ennemi
         private const int EnemyWidth = 64;
         private const int EnemyHeight = 128;
@@ -21,7 +27,33 @@ namespace MyGame.Models
             _texture = texture;
             Position = initialPosition;
         }
-
+        public void TakeDamage(int damage)
+        {
+            Health -= damage;
+            if (Health <= 0)
+            {
+                // L'ennemi meurt
+                Die();
+          
+            }
+        }
+        private async void StartGameCloseCountdown()
+        {
+            await Task.Delay(5000); // Attendre 5 secondes
+            Environment.Exit(0); // Ferme le jeu
+        }
+        public void Die()
+        {
+            Console.WriteLine("Enemy is dead.");
+            StartGameCloseCountdown();
+        }
+            public void Draw(Texture2D texture, SpriteBatch spriteBatch)
+        {
+            if (IsAlive)
+            {
+                spriteBatch.Draw(texture, Position, Color.White);
+            }
+        }
         public Rectangle GetEnemyRectangle()
         {
             return new Rectangle((int)Position.X, (int)Position.Y, EnemyWidth, EnemyHeight);
@@ -98,10 +130,12 @@ namespace MyGame.Models
                 }
             }
         }
+        
 
         // Méthode pour dessiner l'ennemi
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch _spriteBatch)
         {
+            
             Rectangle destinationRectangle = new Rectangle(
                 (int)Position.X,
                 (int)Position.Y,
@@ -109,7 +143,7 @@ namespace MyGame.Models
                 EnemyHeight
             );
 
-            spriteBatch.Draw(_texture, destinationRectangle, Color.White);
+            _spriteBatch.Draw(_texture, destinationRectangle, Color.White);
         }
     }
 }

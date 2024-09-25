@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
 using MyGame.Game;
 using MyGame.Services;
+using MyGame.Models;
 
 namespace MyGame.Models
 {
@@ -24,7 +26,10 @@ namespace MyGame.Models
         private int _screenHeight;
         private Weapon _currentWeapon; // L'arme actuelle du joueur
         private Vector2 _weaponOffset = new Vector2(30, 50); // Position de l'arme par rapport au joueur
-
+        //Bullet
+        public List<Bullet> Bullets { get; private set; } = new List<Bullet>();
+        private float fireCooldown = 0.2f; // Temps entre chaque tir
+        private float timeSinceLastShot = 0f;
         public Player(ContentManager content, Texture2D texture, Vector2 initialPosition, int screenWidth, int screenHeight, int mapWidth, int mapHeight, Weapon weapon)
         {
             Position = initialPosition;
@@ -42,9 +47,24 @@ namespace MyGame.Models
             UpdatePosition(gameTime);
             PreventLeavingScreen();
 
-            // Mise à jour de l'arme en fonction de la position de la souris
-            Vector2 mousePosition = inputManager.GetMousePosition();
-            UpdateWeapon(mousePosition);
+            // Mise à jour du cooldown du tir
+            timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            // Vérifier si le joueur tire (touche de tir)
+
+            if (inputManager.IsShootPressed())
+            {
+                Fire();
+            }
+
+            // Mise à jour des projectiles
+            foreach (var bullet in Bullets)
+            {
+                bullet.Update(gameTime);
+            }
+
+            // Retirer les projectiles hors écran
+            Bullets.RemoveAll(b => b.Bounds.X < 0 || b.Bounds.X > _screenWidth);
+
         }
 
         private void ApplyGravity(GameTime gameTime)
@@ -65,6 +85,16 @@ namespace MyGame.Models
 
             Vector2 movement = inputManager.GetMovement();
             _velocity.X = movement.X * 300; // Vitesse horizontale
+                                            // Si le joueur se déplace à gauche
+            if (movement.X < 0)
+            {
+                _isFacingRight = true; // Le joueur regarde à gauche
+            }
+            // Si le joueur se déplace à droite
+            else if (movement.X > 0)
+            {
+                _isFacingRight = false; // Le joueur regarde à droite
+            }
         }
 
         private void CheckCollisions(TiledMap map)
@@ -103,26 +133,48 @@ namespace MyGame.Models
             Position += _velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
 
-        private void UpdateWeapon(Vector2 mousePosition)
+        
+        private void Fire()
         {
-            // Calculer l'angle entre le joueur et la souris
-            Vector2 direction = mousePosition - (Position + _weaponOffset);
-            float angle = (float)Math.Atan2(direction.Y, direction.X);
-            _isFacingRight = mousePosition.X > Position.X;
+            if (timeSinceLastShot >= fireCooldown)
+            {
+                // Créer un projectile (mini-rectangle)
+                Vector2 bulletVelocity = !_isFacingRight ? new Vector2(600, 0) : new Vector2(-600, 0); // Vitesse du projectile
+                Vector2 bulletStartPos = Position + (_isFacingRight ? _weaponOffset : new Vector2(-_weaponOffset.X, _weaponOffset.Y));
 
-            // Définir la rotation de l'arme
-            _currentWeapon.SetRotation(angle, _isFacingRight);
+                Texture2D bulletTexture = _currentWeapon.WeaponTexture; // Texture du projectile depuis l'arme
+
+                // Ajouter le projectile à la liste
+                Bullets.Add(new Bullet(bulletTexture, bulletStartPos, bulletVelocity));
+
+                timeSinceLastShot = 0f; // Réinitialiser le cooldown
+            }
+        }
+        private void UpdateWeapon()
+        {
+            _currentWeapon.SetRotation(0f, _isFacingRight);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Dessiner le joueur
+            // Dessiner le joueur avec effet de flip s'il fait face à gauche
+            SpriteEffects spriteEffect = _isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             Rectangle destinationRectangle = new Rectangle((int)Position.X, (int)Position.Y, PlayerWidth, PlayerHeight);
-            spriteBatch.Draw(_texture, destinationRectangle, Colour);
+            spriteBatch.Draw(_texture, destinationRectangle, null, Colour, 0f, Vector2.Zero, spriteEffect, 0f);
 
-            // Dessiner l'arme dans la main du joueur
-            Vector2 weaponPosition = Position + _weaponOffset; // Ajuster la position de l'arme
-            _currentWeapon.Draw(spriteBatch, weaponPosition);
+            // Ajuster la position de l'arme en fonction de la direction du joueur
+            Vector2 weaponPosition = Position + (_isFacingRight ? _weaponOffset : new Vector2(-_weaponOffset.X, _weaponOffset.Y));
+
+            // Dessiner l'arme avec la bonne direction
+            Vector2 weaponOffset = _isFacingRight ? new Vector2(10,-10) : new Vector2(10,-10);
+            _currentWeapon.Draw(spriteBatch, weaponPosition, _isFacingRight);
+
+            // Dessiner les projectiles
+            foreach (var bullet in Bullets)
+            {
+                bullet.Draw(spriteBatch);
+            }
         }
+
     }
 }

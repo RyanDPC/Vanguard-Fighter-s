@@ -54,10 +54,6 @@ namespace MyGame.Services
         {
             return _currentKeyState.IsKeyDown(Keys.Escape) && _previousKeyState.IsKeyUp(Keys.Escape);
         }
-        public Vector2 GetMousePosition()
-        {
-            MouseState mouseState = Mouse.GetState();
-            return new Vector2(mouseState.X, mouseState.Y);
-        }
+     
     }
 }

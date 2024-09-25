@@ -22,6 +22,7 @@ namespace MyGame.Game
         private Texture2D currentBackground;
         private TiledMap currentMap; // Utiliser TiledMap de MonoGame.Extended
         private Weapon weapon;
+        private EnemyLibrary enemyLibrary;
         private int screenHeight;
         private int mapWidthInPixels;
         private int mapHeightInPixels;
@@ -44,6 +45,7 @@ namespace MyGame.Game
         {
             inputManager = new InputManager();
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
 
             screenWidth = _graphics.PreferredBackBufferWidth;
             screenHeight = _graphics.PreferredBackBufferHeight;
@@ -85,6 +87,10 @@ namespace MyGame.Game
             // Charger et initialiser l'ennemi
             Texture2D enemyTexture = Content.Load<Texture2D>("Players/WukongEntier");
             Vector2 enemyInitialPosition = new Vector2(500, 100);
+            enemyLibrary = new EnemyLibrary(enemyTexture);
+            enemyLibrary.AddEnemy(new Vector2(500, 100));
+            enemyLibrary.AddEnemy(new Vector2(600, 150));
+
             enemy = new Enemy(enemyTexture, enemyInitialPosition);
         }
 
@@ -121,8 +127,22 @@ namespace MyGame.Game
             // Mettre à jour l'ennemi
             enemy.MoveTowardsPlayer(player.Position, gameTime, GraphicsDevice, currentMap);
 
+            // Gestion des collisions entre les projectiles et l'ennemi
+            foreach (var bullet in player.Bullets)
+            {
+                if (bullet.Bounds.Intersects(enemy.GetEnemyRectangle()))
+                {
+                    enemy.TakeDamage(1); // L'ennemi perd 1 point de vie
+                    if (!currentEnemy.IsAlive) // Si l'ennemi n'est plus en vie
+                    {
+                        currentEnemy.Die(); // L'ennemi meurt
+                    }
+                }
+            }
+
             base.Update(gameTime);
         }
+
 
         protected override void Draw(GameTime gameTime)
         {
@@ -147,7 +167,8 @@ namespace MyGame.Game
             player.Draw(_spriteBatch);
 
             // Dessiner l'ennemi
-            enemy.Draw(_spriteBatch);
+
+            enemyLibrary.DrawEnemies(_spriteBatch);
 
             _spriteBatch.End();
 

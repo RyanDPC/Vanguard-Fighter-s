@@ -12,15 +12,18 @@ namespace MyGame.Models
         public float FireRate { get; private set; } // Shots per second
         public float ReloadTime { get; private set; } // Reload time in seconds
         public bool IsReloading { get; private set; }
+        public float Scale { get; private set; } = 0.1f;
+        public Texture2D WeaponTexture => _weaponTexture;
+
         private float timeSinceLastShot;
         private float reloadTimer;
         public Vector2 Size;
         private Texture2D _weaponTexture;
-
         private string specialAbility;
         private float specialCooldown;
         private float timeSinceLastSpecial;
         private float _rotation;
+        private SpriteEffects _spriteEffect;
 
         public Weapon(string name, int maxAmmo, float fireRate, int clipSize, float reloadTime, string specialAbility)
         {
@@ -32,7 +35,7 @@ namespace MyGame.Models
             IsReloading = false;
             timeSinceLastShot = 0;
             reloadTimer = 0;
-            Size = new Vector2(64, 32);
+            Size = new Vector2(10, 6);
             this.specialAbility = specialAbility;
             specialCooldown = 5.0f; // Default cooldown for special abilities
             timeSinceLastSpecial = specialCooldown;
@@ -131,32 +134,26 @@ namespace MyGame.Models
             }
         }
 
-        public void SetRotation(float rotation, bool isFacingRight)
+        public void SetRotation(float rotation, bool flipHorizontally)
         {
-            // If facing right, keep normal rotation
-            // If facing left, reverse the rotation
-            if (!isFacingRight)
-            {
-                rotation += MathF.PI; // Reverse the rotation by 180 degrees
-            }
-            // Store the rotation for later drawing
+            SpriteEffects spriteEffect = flipHorizontally ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
             _rotation = rotation;
+            _spriteEffect = spriteEffect;
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, bool isFacingRight, float Scale = 0.1f)
         {
-            // Define desired weapon dimensions
-            int weaponWidth = _weaponTexture.Width / 4;
-            int weaponHeight = _weaponTexture.Height / 4;
-            Rectangle destinationRectangle = new Rectangle((int)position.X, (int)position.Y, weaponWidth, weaponHeight);
+            
+            Vector2 origin = new Vector2(_weaponTexture.Width / 2f, _weaponTexture.Height / 2);
+            // Appliquer le flip horizontal en fonction de la direction du joueur
+            SpriteEffects spriteEffect = !isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-            // Draw the weapon with rotation
-            Vector2 scale = new Vector2(Size.X / _weaponTexture.Width, Size.Y / _weaponTexture.Height);
+            // Dessiner l'arme avec la dddbonne direction
+            spriteBatch.Draw(_weaponTexture, position, null, Color.White, 0f, origin, Scale, spriteEffect, 0f);
 
-            spriteBatch.Draw(_weaponTexture, destinationRectangle, null, Color.White, _rotation, new Vector2(weaponWidth / 2, weaponHeight / 2), SpriteEffects.None, 0f);
         }
-
-        public void SetWeaponTexture(Texture2D texture)
+            public void SetWeaponTexture(Texture2D texture)
         {
             _weaponTexture = texture;
         }
