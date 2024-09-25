@@ -19,6 +19,7 @@ mono_crash.*
 
 # Build results
 [Cc]ontent/
+[Ee]xe
 [Rr]elease/
 [Rr]eleases/
 x64/
