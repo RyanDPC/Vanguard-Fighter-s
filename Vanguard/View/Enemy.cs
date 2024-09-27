@@ -1,10 +1,9 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 using System;
 
-namespace MyGameProjectComplete.Models
+namespace MyGameProjectComplete.View
 {
     public class Enemy
     {

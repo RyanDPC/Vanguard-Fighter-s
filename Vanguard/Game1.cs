@@ -1,10 +1,12 @@
 
+using ModelsWeapon = MyGameProjectComplete.Models.Weapon;
+using ViewWeapon = MyGameProjectComplete.View.Weapon;
+using MyGameProjectComplete.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MyGameProjectComplete.Models;
-using MyGameProjectComplete.View;
-using MyGameProjectComplete.Services;
+
 
 namespace MyGameProjectComplete
 {
@@ -15,7 +17,8 @@ namespace MyGameProjectComplete
         Player player;
         Enemy enemy;
         Map map;
-        Weapon weapon;
+        ModelsWeapon modelsWeapon; // Utilisation de l'alias
+        ViewWeapon viewWeapon;     // Utilisation de l'alias
         Bullet bullet;
 
         public Game1()
@@ -39,7 +42,8 @@ namespace MyGameProjectComplete
             player = new Player(playerTexture, new Vector2(100, 100));
             enemy = new Enemy(enemyTexture, new Vector2(300, 100), player);
             map = new Map(backgroundTexture);
-            weapon = new Weapon(weaponTexture, new Vector2(150, 150));
+            modelsWeapon = new ModelsWeapon(weaponTexture, new Vector2(150, 150)); // Utilisation de l'alias
+            viewWeapon = new ViewWeapon(weaponTexture, new Vector2(150, 150));       // Utilisation de l'alias
             bullet = new Bullet(bulletTexture, new Vector2(150, 150), new Vector2(1, 0), 5.0f);
         }
 
@@ -69,7 +73,8 @@ namespace MyGameProjectComplete
             map.Draw(spriteBatch, Vector2.Zero);
             player.Draw(spriteBatch);
             enemy.Draw(spriteBatch);
-            weapon.Draw(spriteBatch);
+            modelsWeapon.Draw(spriteBatch); // Utilisation de l'alias
+            viewWeapon.Draw(spriteBatch);   // Utilisation de l'alias
             bullet.Draw(spriteBatch);
             spriteBatch.End();
 
@@ -77,3 +82,4 @@ namespace MyGameProjectComplete
         }
     }
 }
+

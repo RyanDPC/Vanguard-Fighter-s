@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MyGameProjectComplete.Models
+namespace MyGameProjectComplete.View
 {
     public class Player
     {

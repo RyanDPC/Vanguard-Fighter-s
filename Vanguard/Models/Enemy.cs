@@ -1,7 +1,6 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 using System;
 
 namespace MyGameProjectComplete.Models
@@ -17,6 +16,10 @@ namespace MyGameProjectComplete.Models
             Texture = texture;
             Position = initialPosition;
             player = targetPlayer;
+        }
+        public Rectangle GetBounds()
+        {
+            return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
         }
 
         public void Update(GameTime gameTime)

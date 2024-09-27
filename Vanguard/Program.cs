@@ -1,2 +1,2 @@
-﻿using var game = new Vanguard.Game1();
+﻿using var game = new Microsoft.Xna.Framework.Game();
 game.Run();
