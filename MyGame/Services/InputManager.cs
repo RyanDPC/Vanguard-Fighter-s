@@ -7,11 +7,24 @@ namespace MyGame.Services
     {
         private KeyboardState _currentKeyState;
         private KeyboardState _previousKeyState;
-
-        public void Update()
+        private bool _canJump = true; // Pour limiter le saut multiple trop rapide
+        private float _jumpCooldown = 0.1f; // Temps avant de pouvoir sauter à nouveau
+        private float _jumpTimer = 0f;
+        public void Update(GameTime gameTime)
         {
             // Mise à jour des états des touches
             _previousKeyState = _currentKeyState;
+            _currentKeyState = Keyboard.GetState();
+
+            // Gestion du cooldown pour le saut
+            if (!_canJump)
+            {
+                _jumpTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (_jumpTimer <= 0)
+                {
+                    _canJump = true;
+                }
+            }
             _currentKeyState = Keyboard.GetState();
         }
 
@@ -27,7 +40,13 @@ namespace MyGame.Services
 
         public bool IsJumpPressed()
         {
-            return _currentKeyState.IsKeyDown(Keys.Space) && _previousKeyState.IsKeyUp(Keys.Space);
+            if (_canJump && _currentKeyState.IsKeyDown(Keys.Space) && _previousKeyState.IsKeyUp(Keys.Space))
+            {
+                _canJump = false; // Désactive la possibilité de sauter immédiatement après un saut
+                _jumpTimer = _jumpCooldown; // Réinitialise le cooldown
+                return true;
+            }
+            return false;
         }
 
         public bool IsShootPressed()
@@ -52,7 +71,7 @@ namespace MyGame.Services
 
         public bool IsEscapePressed()
         {
-            return _currentKeyState.IsKeyDown(Keys.Escape) && _previousKeyState.IsKeyUp(Keys.Escape);
+            return _currentKeyState.IsKeyDown(Keys.F11) && _previousKeyState.IsKeyUp(Keys.F11);
         }
      
     }

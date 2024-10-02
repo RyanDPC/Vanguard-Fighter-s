@@ -88,7 +88,7 @@ namespace MyGame.Game
             Texture2D enemyTexture = Content.Load<Texture2D>("Players/WukongEntier");
             Vector2 enemyInitialPosition = new Vector2(500, 100);
             enemyLibrary = new EnemyLibrary(enemyTexture);
-            enemyLibrary.AddEnemy(new Vector2(500, 100));
+            enemyLibrary.AddEnemy(new Vector2(100, 500));
             enemyLibrary.AddEnemy(new Vector2(600, 150));
 
             enemy = new Enemy(enemyTexture, enemyInitialPosition);
@@ -110,7 +110,7 @@ namespace MyGame.Game
 
         protected override void Update(GameTime gameTime)
         {
-            inputManager.Update();
+            inputManager.Update(gameTime);
 
             if (inputManager.IsEscapePressed())
             {
@@ -130,12 +130,12 @@ namespace MyGame.Game
             // Gestion des collisions entre les projectiles et l'ennemi
             foreach (var bullet in player.Bullets)
             {
-                if (bullet.Bounds.Intersects(enemy.GetEnemyRectangle()))
+                if (bullet.Bounds.Contains(enemy.GetEnemyRectangle()))
                 {
                     enemy.TakeDamage(1); // L'ennemi perd 1 point de vie
-                    if (!currentEnemy.IsAlive) // Si l'ennemi n'est plus en vie
+                    if (!enemy.IsAlive) // Si l'ennemi n'est plus en vie
                     {
-                        currentEnemy.Die(); // L'ennemi meurt
+                        enemy.Die(); // L'ennemi meurt
                     }
                 }
             }

@@ -1,2 +1,4 @@
-﻿using var game = new Microsoft.Xna.Framework.Game();
+﻿using MyGameProjectComplete;
+
+using var game = new Game1();
 game.Run();

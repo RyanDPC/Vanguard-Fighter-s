@@ -15,18 +15,20 @@ namespace MyGame.Models
         public int Health { get; set; } = 5;
         public bool IsAlive => Health > 0;
 
-        private float speed = 150.0f; // Vitesse de l'ennemi
+        private float speed = 100.0f; // Vitesse de l'ennemi
         private const int EnemyWidth = 64;
         private const int EnemyHeight = 128;
 
         private float gravity = 980f; // Gravité appliquée sur l'ennemi
         private bool isOnGround = false;
+        private double _rotation;
 
         public Enemy(Texture2D texture, Vector2 initialPosition)
         {
             _texture = texture;
             Position = initialPosition;
         }
+
         public void TakeDamage(int damage)
         {
             Health -= damage;
@@ -34,26 +36,30 @@ namespace MyGame.Models
             {
                 // L'ennemi meurt
                 Die();
-          
             }
         }
+
         private async void StartGameCloseCountdown()
         {
             await Task.Delay(5000); // Attendre 5 secondes
             Environment.Exit(0); // Ferme le jeu
         }
+
         public void Die()
         {
             Console.WriteLine("Enemy is dead.");
             StartGameCloseCountdown();
         }
-            public void Draw(Texture2D texture, SpriteBatch spriteBatch)
+
+        // Méthode pour dessiner l'ennemi
+        public void Draw(Texture2D texture, SpriteBatch spriteBatch)
         {
             if (IsAlive)
             {
                 spriteBatch.Draw(texture, Position, Color.White);
             }
         }
+
         public Rectangle GetEnemyRectangle()
         {
             return new Rectangle((int)Position.X, (int)Position.Y, EnemyWidth, EnemyHeight);
@@ -63,10 +69,10 @@ namespace MyGame.Models
         public void MoveTowardsPlayer(Vector2 playerPosition, GameTime gameTime, GraphicsDevice graphicsDevice, TiledMap tiledMap)
         {
             // Calculer la direction vers le joueur
-            Vector2 direction = playerPosition - Position;
+            var direction = new Vector2((float)Math.Cos(_rotation), (float)Math.Sin(_rotation));
 
             // Suivre le joueur uniquement sur l'axe X
-            if (direction.X != 0)
+            if (Math.Abs(direction.X) > 1f)
             {
                 direction.Normalize(); // Normaliser pour obtenir une vitesse constante
                 Position += new Vector2(direction.X * speed * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
@@ -130,20 +136,21 @@ namespace MyGame.Models
                 }
             }
         }
-        
 
         // Méthode pour dessiner l'ennemi
-        public void Draw(SpriteBatch _spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            
-            Rectangle destinationRectangle = new Rectangle(
-                (int)Position.X,
-                (int)Position.Y,
-                EnemyWidth,
-                EnemyHeight
-            );
+            if (IsAlive)
+            {
+                Rectangle destinationRectangle = new Rectangle(
+                    (int)Position.X,
+                    (int)Position.Y,
+                    EnemyWidth,
+                    EnemyHeight
+                );
 
-            _spriteBatch.Draw(_texture, destinationRectangle, Color.White);
+                spriteBatch.Draw(_texture, destinationRectangle, Color.White);
+            }
         }
     }
 }
