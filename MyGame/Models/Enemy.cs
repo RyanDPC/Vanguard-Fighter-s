@@ -10,23 +10,24 @@ namespace MyGame.Models
     public class Enemy
     {
         private Texture2D _texture;
+        private Weapon _weapon;
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; } = Vector2.Zero;
         public int Health { get; set; } = 5;
         public bool IsAlive => Health > 0;
 
-        private float speed = 100.0f; // Vitesse de l'ennemi
+        private float speed = 150.0f; // Vitesse de l'ennemi
         private const int EnemyWidth = 64;
         private const int EnemyHeight = 128;
 
         private float gravity = 980f; // Gravité appliquée sur l'ennemi
         private bool isOnGround = false;
-        private double _rotation;
 
-        public Enemy(Texture2D texture, Vector2 initialPosition)
+        public Enemy(Texture2D texture, Vector2 initialPosition, Weapon weapon)
         {
             _texture = texture;
             Position = initialPosition;
+            _weapon = weapon;
         }
 
         public void TakeDamage(int damage)
@@ -69,7 +70,7 @@ namespace MyGame.Models
         public void MoveTowardsPlayer(Vector2 playerPosition, GameTime gameTime, GraphicsDevice graphicsDevice, TiledMap tiledMap)
         {
             // Calculer la direction vers le joueur
-            var direction = new Vector2((float)Math.Cos(_rotation), (float)Math.Sin(_rotation));
+            Vector2 direction = playerPosition - Position;
 
             // Suivre le joueur uniquement sur l'axe X
             if (Math.Abs(direction.X) > 1f)
@@ -136,6 +137,10 @@ namespace MyGame.Models
                 }
             }
         }
+        public void Update()
+        {
+
+        }
 
         // Méthode pour dessiner l'ennemi
         public void Draw(SpriteBatch spriteBatch)
@@ -151,6 +156,16 @@ namespace MyGame.Models
 
                 spriteBatch.Draw(_texture, destinationRectangle, Color.White);
             }
+        }
+
+        public bool IsDead()
+        {
+            if(Health  > 0)
+            {
+                return false;
+            }
+            else
+            return true; 
         }
     }
 }

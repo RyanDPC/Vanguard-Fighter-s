@@ -7,11 +7,13 @@ using MonoGame.Extended.Tiled;
 using MyGame.Game;
 using MyGame.Services;
 using MyGame.Models;
+using MyGame.Content.Weapons;
 
 namespace MyGame.Models
 {
     public class Player
     {
+        private WeaponLibrary library;
         public Vector2 Position { get; private set; }
         public Color Colour = Color.White;
         private Vector2 _velocity;
@@ -28,7 +30,6 @@ namespace MyGame.Models
         private Vector2 _weaponOffset = new Vector2(30, 50); // Position de l'arme par rapport au joueur
         //Bullet
         public List<Bullet> Bullets { get; private set; } = new List<Bullet>();
-        private float fireCooldown = 0.2f; // Temps entre chaque tir
         private float timeSinceLastShot = 0f;
         public Player(ContentManager content, Texture2D texture, Vector2 initialPosition, int screenWidth, int screenHeight, int mapWidth, int mapHeight, Weapon weapon)
         {
@@ -136,7 +137,11 @@ namespace MyGame.Models
         
         private void Fire()
         {
-            if (timeSinceLastShot >= fireCooldown)
+            if (timeSinceLastShot >= (1 / _currentWeapon.FireRate)) {
+                _currentWeapon.Shoot();
+                
+                timeSinceLastShot = 0;
+            }
             {
                 // Créer un projectile (mini-rectangle)
                 Vector2 bulletVelocity = !_isFacingRight ? new Vector2(600, 0) : new Vector2(-600, 0); // Vitesse du projectile
@@ -154,7 +159,6 @@ namespace MyGame.Models
         {
             _currentWeapon.SetRotation(0f, _isFacingRight);
         }
-
         public void Draw(SpriteBatch spriteBatch)
         {
             // Dessiner le joueur avec effet de flip s'il fait face à gauche

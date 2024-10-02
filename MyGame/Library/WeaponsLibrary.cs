@@ -6,8 +6,8 @@ namespace MyGame.Content.Weapons
 {
     public class WeaponLibrary
     {
-        public Weapon AdvancedAssaultRifle { get; private set; }
-        public Weapon CompactSidearm { get; private set; }
+        public Weapon AdvancedAssaultRifle { get;  set; }
+        public Weapon CompactSidearm { get;  set; }
         public Weapon EnergyRifle { get; private set; }
         public Weapon FuturisticPistol { get; private set; }
         public Weapon IonRifle { get; private set; }
@@ -101,7 +101,10 @@ namespace MyGame.Content.Weapons
                 "Precision mode with extended range"
             );
         }
+        //public void GetWeapon() 
+        //{
 
+        //}
         // Method to test the weapons
         public void TestWeapons()
         {

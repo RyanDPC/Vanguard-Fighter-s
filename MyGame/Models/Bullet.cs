@@ -1,5 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MyGame.Content.Weapons;
+
+    
 
 
 namespace MyGame.Models
@@ -12,7 +15,7 @@ namespace MyGame.Models
         public Bullet(Texture2D texture, Vector2 position, Vector2 velocity)
         {
             _texture = texture;
-            Bounds = new Rectangle((int)position.X, (int)position.Y, 10, 5);
+            Bounds = new Rectangle((int)position.X, (int)position.Y, 15, 7);
             Velocity = velocity;
         }
         public void Update(GameTime gameTime)

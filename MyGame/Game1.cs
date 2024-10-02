@@ -5,7 +5,9 @@ using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MyGame.Models;
 using MyGame.Services;
+using MyGame.Library;
 using System.Collections.Generic;
+using MyGame.Content.Weapons;
 
 namespace MyGame.Game
 {
@@ -17,16 +19,18 @@ namespace MyGame.Game
         private Player player;
         private Enemy enemy;
         private InputManager inputManager;
-        private List<TiledMap> maps; // Utiliser TiledMap de MonoGame.Extended
+        private List<TiledMap> maps;
         private List<Texture2D> backgrounds;
         private Texture2D currentBackground;
-        private TiledMap currentMap; // Utiliser TiledMap de MonoGame.Extended
+        private TiledMap currentMap;
         private Weapon weapon;
         private EnemyLibrary enemyLibrary;
+        private WeaponLibrary weaponLibrary;
         private int screenHeight;
         private int mapWidthInPixels;
         private int mapHeightInPixels;
         private int screenWidth;
+        private Texture2D texture;
 
         public Game1()
         {
@@ -34,7 +38,7 @@ namespace MyGame.Game
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             backgrounds = new List<Texture2D>();
-            maps = new List<TiledMap>(); // Modifier pour utiliser TiledMap de MonoGame.Extended
+            maps = new List<TiledMap>();
 
             _graphics.PreferredBackBufferWidth = 1920;
             _graphics.PreferredBackBufferHeight = 1080;
@@ -68,7 +72,7 @@ namespace MyGame.Game
             Texture2D playerTexture = Content.Load<Texture2D>("Players/SpecialistFace");
             
             Texture2D weaponTexture = Content.Load<Texture2D>("Weapons/Ion Rifle");
-            weapon = new Weapon("Rifle", 30, 5f, 10, 2f, "Automatic fire"); // Example weapon
+            weapon = new Weapon("IonRifle", 30, 5f, 10, 2f, "Automatic fire"); // Example weapon
             weapon.SetWeaponTexture(weaponTexture);
             weapon.Size = new Vector2(64, 32);
 
@@ -87,11 +91,11 @@ namespace MyGame.Game
             // Charger et initialiser l'ennemi
             Texture2D enemyTexture = Content.Load<Texture2D>("Players/WukongEntier");
             Vector2 enemyInitialPosition = new Vector2(500, 100);
-            enemyLibrary = new EnemyLibrary(enemyTexture);
-            enemyLibrary.AddEnemy(new Vector2(100, 500));
-            enemyLibrary.AddEnemy(new Vector2(600, 150));
+            enemyLibrary = new EnemyLibrary(enemyTexture, weaponLibrary);
+            enemyLibrary.AddEnemy();
+            enemyLibrary.AddEnemy();
 
-            enemy = new Enemy(enemyTexture, enemyInitialPosition);
+            enemy = new Enemy(enemyTexture, enemyInitialPosition, weapon);
         }
 
         private void LoadMap(int mapIndex)
@@ -130,7 +134,7 @@ namespace MyGame.Game
             // Gestion des collisions entre les projectiles et l'ennemi
             foreach (var bullet in player.Bullets)
             {
-                if (bullet.Bounds.Contains(enemy.GetEnemyRectangle()))
+                if (bullet.Bounds.Contains(enemy.Position))
                 {
                     enemy.TakeDamage(1); // L'ennemi perd 1 point de vie
                     if (!enemy.IsAlive) // Si l'ennemi n'est plus en vie
@@ -168,7 +172,7 @@ namespace MyGame.Game
 
             // Dessiner l'ennemi
 
-            enemyLibrary.DrawEnemies(_spriteBatch);
+            enemyLibrary.Draw(_spriteBatch);
 
             _spriteBatch.End();
 

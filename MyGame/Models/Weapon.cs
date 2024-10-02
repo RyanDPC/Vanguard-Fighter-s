@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MyGame.Content.Weapons;
 
 namespace MyGame.Models
 {
@@ -14,6 +15,7 @@ namespace MyGame.Models
         public bool IsReloading { get; private set; }
         public float Scale { get; private set; } = 0.1f;
         public Texture2D WeaponTexture => _weaponTexture;
+        private Weapon _currentweapon;
 
         private float timeSinceLastShot;
         private float reloadTimer;
@@ -48,9 +50,9 @@ namespace MyGame.Models
                 reloadTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (reloadTimer >= ReloadTime)
                 {
-                    CurrentAmmo = MaxAmmo;
+                    MaxAmmo = _currentweapon.MaxAmmo;
                     IsReloading = false;
-                    reloadTimer = 0;
+                    reloadTimer = _currentweapon.ReloadTime;
                 }
             }
             else

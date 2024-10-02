@@ -1,63 +1,89 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Tiled;
+using MyGame.Content.Weapons;
+using MyGame.Models;
+using System;
 using System.Collections.Generic;
 
-namespace MyGame.Models
+namespace MyGame.Library
 {
     public class EnemyLibrary
     {
-        private List<Enemy> _enemies;
-        private Texture2D _enemyTexture;
-        private int currentEnemyIndex = 0; 
+        private List<Enemy> enemies;
+        private Random random;
+        private Texture2D enemyTexture;
+        private MyGame.Content.Weapons.WeaponLibrary weaponLibrary;
 
-        public EnemyLibrary(Texture2D enemyTexture)
+        public EnemyLibrary(Texture2D enemyTexture, WeaponLibrary weaponLibrary)
         {
-            _enemies = new List<Enemy>();
-            _enemyTexture = enemyTexture;
+            enemies = new List<Enemy>();
+            random = new Random();
+            this.enemyTexture = enemyTexture;
+            this.weaponLibrary = weaponLibrary;
         }
 
-        public void AddEnemy(Vector2 initialPosition)
+        public void InitializeEnemies(int numberOfEnemies)
         {
-            Enemy newEnemy = new Enemy(_enemyTexture, initialPosition);
-            _enemies.Add(newEnemy);
-        }
-
-        public void UpdateEnemies(GameTime gameTime, Vector2 playerPosition, GraphicsDevice graphicsDevice, TiledMap tiledMap)
-        {
-            if (_enemies.Count == 0) return;
-            var currentEnemy = _enemies[currentEnemyIndex];
-            if (currentEnemy.IsAlive)
+            for (int i = 0; i < numberOfEnemies; i++)
             {
-                currentEnemy.MoveTowardsPlayer(playerPosition, gameTime, graphicsDevice, tiledMap);
+                AddEnemy();
             }
-            else
-            {
-                // Si l'ennemi est mort, passer à l'ennemi suivant
-                currentEnemyIndex++;
+        }
 
-                // Vérifier si on a atteint la fin de la liste des ennemis
-                if (currentEnemyIndex >= _enemies.Count)
+        public void AddEnemy()
+        {
+            // Position aléatoire sur la carte
+            int xPosition = random.Next(100, 1800);
+            int yPosition = random.Next(100, 900);
+            WeaponLibrary weaponLibrary = new WeaponLibrary();
+
+            List<Weapon> weapons = new List<Weapon>()
+            {
+                weaponLibrary.IonRifle,
+                weaponLibrary.EnergyRifle,
+                weaponLibrary.AdvancedAssaultRifle,
+                weaponLibrary.CompactSidearm,
+                weaponLibrary.StealthHandgun,
+                weaponLibrary.PlasmaBlaster,
+                weaponLibrary.TacticalPistol,
+                weaponLibrary.SciFiShotgun,
+                weaponLibrary.FuturisticPistol,
+            };
+            int randomIndex = random.Next(weapons.Count);
+            // Sélectionner une arme aléatoire
+            Weapon assignedWeapon = weapons[randomIndex] ;
+
+            // Créer un nouvel ennemi avec une position aléatoire et une arme
+            Enemy newEnemy = new Enemy(enemyTexture, new Vector2(xPosition, yPosition), assignedWeapon);
+            enemies.Add(newEnemy);
+        }
+
+        public void RemoveEnemy(Enemy enemy)
+        {
+            enemies.Remove(enemy);
+            AddEnemy(); // Ajoute un autre ennemi après la mort de celui-ci
+        }
+
+        public void Update(GameTime gameTime, Player player)
+        {
+            foreach (var enemy in enemies)
+            {
+                enemy.Update();
+
+                // Vérifie si l'ennemi est mort
+                if (enemy.IsDead())
                 {
-                    currentEnemyIndex = _enemies.Count - 1; // Reste sur le dernier ennemi si tous sont morts
+                    RemoveEnemy(enemy);
                 }
             }
         }
-        public void DrawEnemies(SpriteBatch spriteBatch)
+
+        public void Draw(SpriteBatch spriteBatch)
         {
-            if (_enemies.Count == 0) return; // Aucun ennemi à dessiner
-
-            var currentEnemy = _enemies[currentEnemyIndex]; // Récupère l'ennemi actif
-
-            if (currentEnemy.IsAlive)
+            foreach (var enemy in enemies)
             {
-                currentEnemy.Draw(spriteBatch);
+                enemy.Draw(spriteBatch);
             }
-        }
-
-        public List<Enemy> GetEnemies()
-        {
-            return _enemies;
         }
     }
 }
