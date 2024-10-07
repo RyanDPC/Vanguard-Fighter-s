@@ -1,3 +1,5 @@
+USE db_space_invaders;
+
 /*"À la place de mettre t.[c]ommande.idJoueur je prefere mettre [c].idjoueur pour une meilleure visibilite de la requete et c'est plus simple a retenir pour pour moi" 
 (OUBLI !Ne pas oublier l'ordre quand j'appelle les id et les fk!)*/
 

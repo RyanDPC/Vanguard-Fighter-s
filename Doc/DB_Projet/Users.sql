@@ -1,3 +1,6 @@
+
+USE db_space_invaders;
+
 -- Création de le rôle "Joueur" et affectation de droit(Lire les informations des armes, Créer une commande, Lire toutes les commandes)
 /*J'ai créer un Utilisateur "Filipe" avec des droits de SELECT et INSERT dans des tables prédéfinis. En l'affectant au role "joueur".*/
 
