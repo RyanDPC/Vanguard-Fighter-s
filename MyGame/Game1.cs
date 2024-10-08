@@ -16,6 +16,7 @@ namespace MyGame.Game
         private TiledMapRenderer _mapRenderer;
         private Player player;
         private Enemy enemy;
+        private Enemy currentEnemy;
         private InputManager inputManager;
         private List<TiledMap> maps; // Utiliser TiledMap de MonoGame.Extended
         private List<Texture2D> backgrounds;
@@ -133,9 +134,9 @@ namespace MyGame.Game
                 if (bullet.Bounds.Intersects(enemy.GetEnemyRectangle()))
                 {
                     enemy.TakeDamage(1); // L'ennemi perd 1 point de vie
-                    if (!currentEnemy.IsAlive) // Si l'ennemi n'est plus en vie
+                    if (!enemy.IsAlive) // Si l'ennemi n'est plus en vie
                     {
-                        currentEnemy.Die(); // L'ennemi meurt
+                        enemy.Die(); // L'ennemi meurt
                     }
                 }
             }

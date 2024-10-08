@@ -1,65 +1,149 @@
-
-using ModelsWeapon = MyGameProjectComplete.Models.Weapon;
-using ViewWeapon = MyGameProjectComplete.View.Weapon;
-using MyGameProjectComplete.Services;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MyGameProjectComplete.Models;
+using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Tiled.Renderers;
+using MyGame.Library;
+using MyGame.Models;
+using MyGame.Services;
+using System.Collections.Generic;
 
-
-namespace MyGameProjectComplete
+namespace MyGame.Game
 {
-    public class Game1 : Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        Player player;
-        Enemy enemy;
-        Map map;
-        ModelsWeapon modelsWeapon; // Utilisation de l'alias
-        ViewWeapon viewWeapon;     // Utilisation de l'alias
-        Bullet bullet;
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
+        private TiledMapRenderer _mapRenderer;
+        private Player player;
+        private Enemy enemy;
+        private InputManager inputManager;
+        private List<TiledMap> maps; // Utiliser TiledMap de MonoGame.Extended
+        private List<Texture2D> backgrounds;
+        private Texture2D currentBackground;
+        private TiledMap currentMap; // Utiliser TiledMap de MonoGame.Extended
+        private Weapon weapon;
+        private EnemyLibrary enemyLibrary;
+        private WeaponLibrary weaponLibrary;
+        private int screenHeight;
+        private int mapWidthInPixels;
+        private int mapHeightInPixels;
+        private int screenWidth;
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            backgrounds = new List<Texture2D>();
+            maps = new List<TiledMap>(); // Modifier pour utiliser TiledMap de MonoGame.Extended
+
+            // Initialiser la bibliothèque d'armes
+            weaponLibrary = new WeaponLibrary(Content);
+            weapon = weaponLibrary.GetWeapon("Tactical Pistol");
+
+            // Initialiser le joueur
+            player = new Player(weapon);
+
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
+            _graphics.ApplyChanges();
         }
 
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            inputManager = new InputManager();
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Charger les textures et initialiser les objets de jeu
-            Texture2D playerTexture = Content.Load<Texture2D>("player");
-            Texture2D enemyTexture = Content.Load<Texture2D>("enemy");
-            Texture2D backgroundTexture = Content.Load<Texture2D>("background");
-            Texture2D weaponTexture = Content.Load<Texture2D>("weapon");
-            Texture2D bulletTexture = Content.Load<Texture2D>("bullet");
+            screenWidth = _graphics.PreferredBackBufferWidth;
+            screenHeight = _graphics.PreferredBackBufferHeight;
 
-            player = new Player(playerTexture, new Vector2(100, 100));
-            enemy = new Enemy(enemyTexture, new Vector2(300, 100), player);
-            map = new Map(backgroundTexture);
-            modelsWeapon = new ModelsWeapon(weaponTexture, new Vector2(150, 150)); // Utilisation de l'alias
-            viewWeapon = new ViewWeapon(weaponTexture, new Vector2(150, 150));       // Utilisation de l'alias
-            bullet = new Bullet(bulletTexture, new Vector2(150, 150), new Vector2(1, 0), 5.0f);
+            // Charger le background et la carte avec MonoGame.Extended
+            backgrounds.Add(Content.Load<Texture2D>("Maps/Background"));
+            maps.Add(Content.Load<TiledMap>("Textures/TheForest")); // Charger la carte avec MonoGame.Extended
+
+            if (backgrounds.Count > 0 && maps.Count > 0)
+            {
+                // Assembler le premier background et la première map
+                currentBackground = backgrounds[0];
+                currentMap = maps[0];
+
+                // Initialiser le renderer de la carte
+                _mapRenderer = new TiledMapRenderer(GraphicsDevice, currentMap);
+            }
+
+            // Charger la texture du joueur
+            Texture2D playerTexture = Content.Load<Texture2D>("Players/SpecialistFace");
+
+            // Charger la texture de l'arme
+            Texture2D weaponTexture = Content.Load<Texture2D>("Weapons/Ion Rifle");
+            weapon.SetWeaponTexture(weaponTexture);
+
+            // Obtenir les dimensions de la carte
+            mapWidthInPixels = currentMap.WidthInPixels; // Utiliser WidthInPixels et HeightInPixels de MonoGame.Extended
+            mapHeightInPixels = currentMap.HeightInPixels;
+
+            // Initialiser le joueur
+            Vector2 playerInitialPosition = new Vector2(
+                (GraphicsDevice.PresentationParameters.BackBufferWidth - 64) / 2,
+                GraphicsDevice.PresentationParameters.BackBufferHeight - 128
+            );
+            player.Initialize(Content, playerTexture, playerInitialPosition, screenWidth, screenHeight, mapWidthInPixels, mapHeightInPixels, weapon);
+
+            // Charger et initialiser l'ennemi
+            Texture2D enemyTexture = Content.Load<Texture2D>("Players/WukongEntier");
+            Vector2 enemyInitialPosition = new Vector2(500, 100);
+            enemyLibrary = new EnemyLibrary(enemyTexture);
+            enemyLibrary.AddEnemy(new Vector2(500, 100));
+            enemyLibrary.AddEnemy(new Vector2(600, 150));
+
+            enemy = new Enemy(enemyTexture, enemyInitialPosition);
+        }
+
+        private void LoadMap(int mapIndex)
+        {
+            // Charger la carte actuelle
+            currentMap = maps[mapIndex];
+            _mapRenderer = new TiledMapRenderer(GraphicsDevice, currentMap);
+
+            // Obtenir les dimensions de la carte
+            mapWidthInPixels = currentMap.WidthInPixels;
+            mapHeightInPixels = currentMap.HeightInPixels;
+
+            // Charger le fond associé (si nécessaire)
+            currentBackground = backgrounds[mapIndex];
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (InputService.IsKeyPressed(Keys.Escape))
-                Exit();
+            inputManager.Update();
 
-            player.Update(gameTime);
-            enemy.Update(gameTime);
-            bullet.Update(gameTime);
-
-            // Gestion des collisions entre le bullet et l'ennemi
-            if (CollisionService.CheckCollision(bullet.GetBounds(), enemy.GetBounds()))
+            if (inputManager.IsEscapePressed())
             {
-                // Logique à appliquer en cas de collision
+                _graphics.IsFullScreen = !_graphics.IsFullScreen;
+                _graphics.ApplyChanges();
+            }
+
+            // Mettre à jour la carte
+            _mapRenderer.Update(gameTime);
+
+            // Mettre à jour le joueur
+            player.Update(gameTime, inputManager, currentMap);
+
+            // Mettre à jour l'ennemi
+            enemy.MoveTowardsPlayer(player.Position, gameTime, GraphicsDevice, currentMap);
+
+            // Gestion des collisions entre les projectiles et l'ennemi
+            foreach (var bullet in player.Bullets)
+            {
+                if (bullet.Bounds.Intersects(enemy.GetEnemyRectangle()))
+                {
+                    enemy.TakeDamage(1); // L'ennemi perd 1 point de vie
+                    if (!enemy.IsAlive) // Si l'ennemi n'est plus en vie
+                    {
+                        enemy.Die(); // L'ennemi meurt
+                    }
+                }
             }
 
             base.Update(gameTime);
@@ -69,17 +153,30 @@ namespace MyGameProjectComplete
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
-            map.Draw(spriteBatch, Vector2.Zero);
-            player.Draw(spriteBatch);
-            enemy.Draw(spriteBatch);
-            modelsWeapon.Draw(spriteBatch); // Utilisation de l'alias
-            viewWeapon.Draw(spriteBatch);   // Utilisation de l'alias
-            bullet.Draw(spriteBatch);
-            spriteBatch.End();
+            _spriteBatch.Begin();
+
+            // Dessiner le background
+            if (currentBackground != null)
+            {
+                _spriteBatch.Draw(currentBackground, Vector2.Zero, Color.White);
+            }
+
+            _spriteBatch.End();
+
+            // Dessiner la carte
+            _mapRenderer.Draw();
+
+            _spriteBatch.Begin();
+
+            // Dessiner le joueur
+            player.Draw(_spriteBatch);
+
+            // Dessiner l'ennemi
+            enemyLibrary.DrawEnemies(_spriteBatch);
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
     }
 }
-

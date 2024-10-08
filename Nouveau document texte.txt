@@ -1,0 +1,1 @@
+System.ArgumentNullException : 'The GraphicsDevice must not be null when creating new resources. Arg_ParamName_Name'

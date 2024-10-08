@@ -1,37 +1,32 @@
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MyGameProjectComplete.Models
+
+namespace MyGame.Models
 {
     public class Bullet
     {
-        public Vector2 Position { get; set; }
-        public Vector2 Direction { get; set; }
-        public float Speed { get; set; }
-        private Texture2D Texture;
-
-        public Bullet(Texture2D texture, Vector2 position, Vector2 direction, float speed)
+        public Rectangle Bounds { get; set; }
+        public Vector2 Velocity {get; set;}
+        private Texture2D _texture { get; set; }
+        public Bullet(Texture2D texture, Vector2 position, Vector2 velocity)
         {
-            Texture = texture;
-            Position = position;
-            Direction = direction;
-            Speed = speed;
+            _texture = texture;
+            Bounds = new Rectangle((int)position.X, (int)position.Y, 10, 5);
+            Velocity = velocity;
         }
-
         public void Update(GameTime gameTime)
         {
-            Position += Direction * Speed;
+            // Déplacer le projectile
+            Bounds = new Rectangle(Bounds.X + (int)(Velocity.X * (float)gameTime.ElapsedGameTime.TotalSeconds),
+                               Bounds.Y + (int)(Velocity.Y * (float)gameTime.ElapsedGameTime.TotalSeconds),
+                               Bounds.Width, Bounds.Height);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Position, Color.White);
-        }
-
-        public Rectangle GetBounds()
-        {
-            return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+            // Dessiner le mini-rectangle (projectile)
+            spriteBatch.Draw(_texture, Bounds, Color.Red); // TextureManager.Pixel est une texture 1x1
         }
     }
 }

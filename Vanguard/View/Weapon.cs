@@ -1,4 +1,5 @@
 
+using Autofac;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +18,7 @@ namespace MyGameProjectComplete.View
 
         public void Update(GameTime gameTime)
         {
-            // Logique de tir
+            //logique de tir
         }
 
         public void Draw(SpriteBatch spriteBatch)
