@@ -1,29 +1,43 @@
 
 using Autofac;
+using MyGame.Models;
+using MyGame.Library;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MyGameProjectComplete.View
+namespace MyGame.View
 {
-    public class Weapon
+    public class WeaponView
     {
-        public Vector2 Position { get; set; }
-        public Texture2D Texture { get; private set; }
+        public Texture2D WeaponTexture { get; private set; }
 
-        public Weapon(Texture2D texture, Vector2 initialPosition)
+        private Weapon _weapon;
+        private Vector2 _position;
+        private bool _isFacingRight;
+        private float _scale;
+        private Vector2 _weaponOffset = new Vector2(0, 20);
+
+        
+
+        public WeaponView(Weapon weapon, Vector2 initialPostition, bool isFacingRight, float scale, Vector2 weaponOffset)
         {
-            Texture = texture;
-            Position = initialPosition;
+            this._weapon = weapon;
+            this._position = initialPostition;
+            this._isFacingRight = isFacingRight;
+            this._scale = scale ;
+            this._weaponOffset = weaponOffset;
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(Vector2 Position, bool isFacingRight)
         {
-            //logique de tir
+           this._position = Position + _weaponOffset;
+           this._isFacingRight = isFacingRight;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Position, Color.White);
+            SpriteEffects spriteEffect = _isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            spriteBatch.Draw(_weapon.WeaponTexture, _position, null, Color.White, 0f, Vector2.Zero,_scale, spriteEffect, 0f);
         }
     }
 }

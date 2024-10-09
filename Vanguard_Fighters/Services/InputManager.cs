@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Drawing;
 
 namespace MyGame.Services
 {
@@ -7,12 +8,18 @@ namespace MyGame.Services
     {
         private KeyboardState _currentKeyState;
         private KeyboardState _previousKeyState;
+        private MouseState _currentMouseState;
+        private MouseState _previousMouseState;
+        private GraphicsDeviceManager _graphics;
 
         public void Update()
         {
             // Mise à jour des états des touches
             _previousKeyState = _currentKeyState;
             _currentKeyState = Keyboard.GetState();
+
+            _previousMouseState = _currentMouseState;
+            _currentMouseState = Mouse.GetState();
         }
 
         public Vector2 GetMovement()
@@ -32,7 +39,7 @@ namespace MyGame.Services
 
         public bool IsShootPressed()
         {
-            return Mouse.GetState().LeftButton == ButtonState.Pressed;
+            return _currentMouseState.LeftButton == ButtonState.Pressed;
         }
 
         public bool IsReloadPressed()
@@ -46,12 +53,24 @@ namespace MyGame.Services
             {
                 case 1: return _currentKeyState.IsKeyDown(Keys.D1);
                 case 2: return _currentKeyState.IsKeyDown(Keys.D2);
+                case 3: return _currentKeyState.IsKeyDown(Keys.D3);
+                case 4: return _currentKeyState.IsKeyDown(Keys.D4);
+                case 5: return _currentKeyState.IsKeyDown(Keys.P);
+                case 6: return _currentKeyState.IsKeyDown(Keys.D6);
+                case 7: return _currentKeyState.IsKeyDown(Keys.D7);
+                case 8: return _currentKeyState.IsKeyDown(Keys.D8);
+                case 9: return _currentKeyState.IsKeyDown(Keys.D9);
+
                 default: return false;
             }
         }
-
+        public bool IsSpecialAbilityPressed()
+        {
+            return _currentMouseState.RightButton == ButtonState.Pressed && _previousMouseState.RightButton==ButtonState.Released;
+        }
         public bool IsEscapePressed()
         {
+          
             return _currentKeyState.IsKeyDown(Keys.Escape) && _previousKeyState.IsKeyUp(Keys.Escape);
         }
      

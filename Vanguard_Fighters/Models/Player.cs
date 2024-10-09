@@ -1,119 +1,76 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Tiled;
+using MyGame.Models;
 using MyGame.Services;
+using MonoGame.Extended.Tiled;
+using System;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MyGame.Models
 {
     public class Player
     {
-        public Texture2D Texture { get; private set; }
         public Vector2 Position { get; private set; }
-        public Color Color = Color.White;
-        private Vector2 _velocity;
-        private Texture2D _texture;
-        private bool isOnGround = false;
-        private bool _isFacingRight = true; // Le joueur fait face à la droite par défaut
-        private float gravity = 1500f;
-        private float jumpStrength = -600f; // Force du saut
-        private const int PlayerWidth = 64;
-        private const int PlayerHeight = 128;
-        private int _screenWidth;
-        private int _screenHeight;
-        private int MapWidth;
-        private int MapHeight;
-        private Weapon Weapon; // L'arme actuelle du joueur
-        private Vector2 _weaponOffset = new Vector2(30, 50); // Position de l'arme par rapport au joueur
+        public Vector2 Velocity { get; private set; }
+        public int Health { get; private set; }
+        public Weapon Weapon { get; private set; }
+        public bool IsOnGround { get; private set; }
 
-        // Bullet
-        public List<Bullet> Bullets { get; private set; } = new List<Bullet>();
-        private float fireCooldown = 0.5f; // Temps entre chaque tir
-        private float timeSinceLastShot = 0f;
+        private const float Gravity = 1500f;
+        private const float JumpStrength = -600f;
+        private const int MaxHealth = 100;
+        private int screenWidth;
+        private int screenHeight;
+        private bool _isFacingRight;
 
-        public Player(ContentManager content, Texture2D texture, Vector2 initialPosition, int screenWidth, int screenHeight, int mapWidth, int mapHeight, Weapon weapon)
+        public Player(Vector2 initialPosition, int screenWidth, int screenHeight, Weapon initialWeapon)
         {
-            this._texture = texture;
-            this.Position = initialPosition;
-            this._screenWidth = screenWidth;
-            this._screenHeight = screenHeight;
-            this.MapWidth = mapWidth;
-            this.MapHeight = mapHeight;
-            this.Weapon = weapon;
-        }
-        public void Initialize(ContentManager content, Texture2D texture, Vector2 initialPosition, int screenWidth, int screenHeight, int mapWidth, int mapHeight, Weapon weapon)
-        {
-            this.Texture = texture;
-            this.Position = initialPosition;
-            this._screenWidth = screenWidth;
-            this._screenHeight = screenHeight;
-            this.MapWidth = mapWidth;
-            this.MapHeight = mapHeight;
-            this.Weapon = weapon;
+            Position = initialPosition;
+            Velocity = Vector2.Zero;
+            Health = MaxHealth;
+            Weapon = initialWeapon;
+            this.screenWidth = screenWidth;
+            this.screenHeight = screenHeight;
+            _isFacingRight = true; // Le joueur regarde par défaut à droite
+            IsOnGround = false;
         }
 
+        // Mise à jour de la position et des mouvements
         public void Update(GameTime gameTime, InputManager inputManager, TiledMap map)
         {
             ApplyGravity(gameTime);
-            HandleInput(inputManager);
+            HandleMovement(inputManager);
             CheckCollisions(map);
             UpdatePosition(gameTime);
-            PreventLeavingScreen();
-
-            // Mise à jour du cooldown du tir
-            timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            // Vérifier si le joueur tire (touche de tir)
-            if (inputManager.IsShootPressed())
-            {
-                Fire();
-            }
-
-            // Mise à jour des projectiles
-            foreach (var bullet in Bullets)
-            {
-                bullet.Update(gameTime);
-            }
-
-            // Retirer les projectiles hors écran
-            Bullets.RemoveAll(b => b.Bounds.X < 0 || b.Bounds.X > _screenWidth);
         }
 
         private void ApplyGravity(GameTime gameTime)
         {
-            if (!isOnGround)
+            if (!IsOnGround)
             {
-                _velocity.Y += gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Velocity += new Vector2(0, Gravity * (float)gameTime.ElapsedGameTime.TotalSeconds);
             }
         }
 
-        private void HandleInput(InputManager inputManager)
+        private void HandleMovement(InputManager inputManager)
         {
-            if (isOnGround && inputManager.IsJumpPressed())
-            {
-                _velocity.Y = jumpStrength;
-                isOnGround = false;
-            }
-
             Vector2 movement = inputManager.GetMovement();
-            _velocity.X = movement.X * 300; // Vitesse horizontale
+            Velocity = new Vector2(movement.X * 300, Velocity.Y);
 
-            if (movement.X < 0)
+            if (inputManager.IsJumpPressed() && IsOnGround)
             {
-                _isFacingRight = true; // Le joueur regarde à gauche
+                Velocity = new Vector2(Velocity.X, JumpStrength);
+                IsOnGround = false;
             }
-            else if (movement.X > 0)
-            {
-                _isFacingRight = false; // Le joueur regarde à droite
-            }
+
+            _isFacingRight = movement.X >= 0; // Mise à jour de la direction du joueur
         }
 
         private void CheckCollisions(TiledMap map)
         {
-            isOnGround = false;
-            Rectangle playerRect = new Rectangle((int)Position.X, (int)(Position.Y + _velocity.Y), PlayerWidth, PlayerHeight);
+            IsOnGround = false;
+
+            Rectangle playerRect = new Rectangle((int)Position.X, (int)Position.Y, 64, 128);
 
             foreach (var layer in map.TileLayers)
             {
@@ -122,76 +79,63 @@ namespace MyGame.Models
                     if (tile.GlobalIdentifier != 0)
                     {
                         Rectangle tileRect = new Rectangle(tile.X * map.TileWidth, tile.Y * map.TileHeight, map.TileWidth, map.TileHeight);
-                        if (playerRect.Intersects(tileRect) && _velocity.Y > 0)
+
+                        if (playerRect.Intersects(tileRect) && Velocity.Y > 0)
                         {
-                            Position = new Vector2(Position.X, tileRect.Top - PlayerHeight);
-                            _velocity.Y = 0;
-                            isOnGround = true;
+                            Position = new Vector2(Position.X, tileRect.Top - 128); // Corrige la position pour éviter de traverser le sol
+                            Velocity = new Vector2(Velocity.X, 0); // Arrête le mouvement vertical
+                            IsOnGround = true;
                         }
                     }
                 }
             }
         }
 
-        private void PreventLeavingScreen()
-        {
-            if (Position.X < 0) Position = new Vector2(0, Position.Y);
-            else if (Position.X + PlayerWidth > _screenWidth) Position = new Vector2(_screenWidth - PlayerWidth, Position.Y);
-            if (Position.Y + PlayerHeight > _screenHeight) Position = new Vector2(Position.X, _screenHeight - PlayerHeight);
-            if (Position.Y < 0) Position = new Vector2(Position.X, 0);
-        }
-
         private void UpdatePosition(GameTime gameTime)
         {
-            Position += _velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Position += Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            // Empêcher le joueur de sortir de l'écran
+            if (Position.X < 0) Position = new Vector2(0, Position.Y);
+            if (Position.X > screenWidth - 64) Position = new Vector2(screenWidth - 64, Position.Y);
+            if (Position.Y > screenHeight - 128) Position = new Vector2(Position.X, screenHeight - 128);
         }
 
-        private void Fire()
+        // Méthode pour tirer avec l'arme équipée
+        public void Shoot(Texture2D bulletTexture)
         {
-            if (timeSinceLastShot >= fireCooldown)
+            // Position actuelle du joueur
+            Vector2 position = Position;
+
+            // Exemple de direction (vers la droite)
+            Vector2 direction = new Vector2(1, 0);
+
+            Weapon.Shoot(bulletTexture, position, direction);
+        }
+
+        // Méthode pour changer d'arme
+        public void ChangeWeapon(Weapon newWeapon)
+        {
+            Weapon = newWeapon;
+        }
+
+        // Méthode pour gérer les dégâts reçus
+        public void TakeDamage(int damage)
+        {
+            Health -= damage;
+            if (Health <= 0)
             {
-                // Créer un projectile (mini-rectangle)
-                Vector2 bulletVelocity = !_isFacingRight ? new Vector2(600, 0) : new Vector2(-600, 0); // Vitesse du projectile
-                Vector2 bulletStartPos = Position + (_isFacingRight ? _weaponOffset : new Vector2(-_weaponOffset.X, _weaponOffset.Y));
-
-                Texture2D bulletTexture = Weapon.WeaponTexture; // Texture du projectile depuis l'arme
-
-                // Ajouter le projectile à la liste
-                Bullets.Add(new Bullet(bulletTexture, bulletStartPos, bulletVelocity));
-
-                timeSinceLastShot = 0f; // Réinitialiser le cooldown
+                Health = 0;
+                Die();
             }
         }
 
-        private void UpdateWeapon()
+        // Gérer la mort du joueur
+        private async void Die()
         {
-            Weapon.SetRotation(0f, _isFacingRight);
-        }
-
-        public void Draw(SpriteBatch spriteBatch, bool _isFacingRight)
-        {
-            // Dessiner le joueur avec effet de flip s'il fait face à gauche
-            SpriteEffects spriteEffect = _isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            Rectangle destinationRectangle = new Rectangle((int)Position.X, (int)Position.Y, PlayerWidth, PlayerHeight);
-            if (_texture != null)
-            {
-                spriteBatch.Draw(_texture, destinationRectangle, null, Color, 0f, Vector2.Zero, spriteEffect, 0f);
-            }
-            else
-            {
-                Console.WriteLine("...");
-            }
-            // Ajuster la position de l'arme en fonction de la direction du joueur
-            Vector2 weaponPosition = Position + (_isFacingRight ? _weaponOffset : new Vector2(-_weaponOffset.X, _weaponOffset.Y));
-
-            // Dessiner l'arme avec la bonne direction
-            Weapon.Draw(spriteBatch, weaponPosition, _isFacingRight);
-
-            // Dessiner les projectiles
-            foreach (var bullet in Bullets)
-            {
-                bullet.Draw(spriteBatch);
-            }
+            Console.WriteLine("Enemy is dead.");
+            await Task.Delay(10000); // Attendre 5 secondes
+            Environment.Exit(0);
         }
     }
 }
