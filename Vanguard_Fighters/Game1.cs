@@ -73,7 +73,7 @@ namespace Vanguard_Fighters
             // Charger la texture du joueur
             Texture2D playerTexture = Content.Load<Texture2D>("Players/SpecialistFace");
             // Charger la texture de l'arme
-            Texture2D weaponTexture = Content.Load<Texture2D>("Weapons/IonRifle");
+            Texture2D weaponTexture = Content.Load<Texture2D>("Weapons/Ion Rifle");
             weapon.SetWeaponTexture(weaponTexture);
           
 

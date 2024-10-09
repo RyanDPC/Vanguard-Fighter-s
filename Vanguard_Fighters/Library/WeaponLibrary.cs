@@ -31,7 +31,7 @@ namespace MyGame.Library
                 800f, // Range in pixels
                 2.5f, // Reload Time (Example)
                 "Automatic burst with slight accuracy loss", // Special ability
-               Content.Load<Texture2D>("Weapons/AdvancedAssaultRifle")
+               Content.Load<Texture2D>("Weapons/Advanced Assault Rifle")
         ));
             weapons.Add("CompactSidearm", new Weapon(
                 "Compact Sidearm",
@@ -42,7 +42,7 @@ namespace MyGame.Library
                 400f,
                 1.2f,
                 "Fast reload",
-                Content.Load<Texture2D>("Weapons/CompactSidearm")
+                Content.Load<Texture2D>("Weapons/Compact Sidearm")
         ));
             weapons.Add("EnergyRifle", new Weapon(
                 "Energy Rifle",
@@ -53,7 +53,7 @@ namespace MyGame.Library
                 1000f,
                 3f,
                 "Explosive shot every 5 shots",
-                Content.Load<Texture2D>("Weapons/EnergyRifle")
+                Content.Load<Texture2D>("Weapons/Energy.Rifle")
         ));
             weapons.Add("FuturisticPistol", new Weapon(
                 "Futuristic Pistol",
@@ -64,7 +64,7 @@ namespace MyGame.Library
                 500f,
                 2f,
                 "Overheats after 5 shots with increased damage",
-                Content.Load<Texture2D>("Weapons/FuturisticPistol")
+                Content.Load<Texture2D>("Weapons/Futuristic_Pistol")
         ));
             weapons.Add("IonRifle", new Weapon(
                 "Ion Rifle",
@@ -75,7 +75,7 @@ namespace MyGame.Library
                 900f,
                 2.8f,
                 "Temporarily disables enemy shields",
-                Content.Load<Texture2D>("Weapons/IonRifle")
+                Content.Load<Texture2D>("Weapons/Ion Rifle")
         ));
             weapons.Add("PlasmaBlaster", new Weapon(
                 "Plasma Blaster",
@@ -86,7 +86,7 @@ namespace MyGame.Library
                 600f,
                 3.5f,
                 "Delayed explosion causing area damage",
-                Content.Load<Texture2D>("Weapons/PlasmaBlaster")
+                Content.Load<Texture2D>("Weapons/Plasma Blaster")
         ));
             weapons.Add("Sci-FiShotgun", new Weapon(
                 "Sci-Fi Shotgun",
@@ -97,7 +97,7 @@ namespace MyGame.Library
                 300f,
                 3f,
                 "Impulse that pushes nearby enemies",
-                Content.Load<Texture2D>("Weapons/SciFiShotgun")
+                Content.Load<Texture2D>("Weapons/SciFi_Shotgun")
         ));
             weapons.Add("StealthHandgun", new Weapon(
                 "Stealth Handgun",
@@ -108,7 +108,7 @@ namespace MyGame.Library
                 200f,
                 2.2f,
                 "Silent shot without revealing position",
-                Content.Load<Texture2D>("Weapons/StealthHandgun")
+                Content.Load<Texture2D>("Weapons/Stealth Handgun")
        ));
             weapons.Add("TacticalPistol", new Weapon(
                 "Tactical Pistol",
@@ -119,7 +119,7 @@ namespace MyGame.Library
                 600f,
                 1.8f,
                 "Precision mode with extended range",
-                Content.Load<Texture2D>("Weapons/TacticalPistol")
+                Content.Load<Texture2D>("Weapons/Tactical Pistol")
        ));
         }
         public Weapon GetWeapon(string name)
