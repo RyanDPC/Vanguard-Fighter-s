@@ -11,6 +11,7 @@ namespace MyGame.Services
         private MouseState _currentMouseState;
         private MouseState _previousMouseState;
         private GraphicsDeviceManager _graphics;
+        private const float SPEED = 1f;
 
         public void Update()
         {
@@ -24,12 +25,12 @@ namespace MyGame.Services
 
         public Vector2 GetMovement()
         {
-            Vector2 movement = Vector2.Zero;
-            if (_currentKeyState.IsKeyDown(Keys.W)) movement.Y -= 1;
-            if (_currentKeyState.IsKeyDown(Keys.S)) movement.Y += 1;
-            if (_currentKeyState.IsKeyDown(Keys.A)) movement.X -= 1;
-            if (_currentKeyState.IsKeyDown(Keys.D)) movement.X += 1;
-            return movement;
+            Vector2 _velocity = Vector2.Zero;
+            if (_currentKeyState.IsKeyDown(Keys.W)) _velocity.Y -= SPEED;
+            if (_currentKeyState.IsKeyDown(Keys.S)) _velocity.Y += SPEED;
+            if (_currentKeyState.IsKeyDown(Keys.A)) _velocity.X -= SPEED;
+            if (_currentKeyState.IsKeyDown(Keys.D)) _velocity.X += SPEED;
+            return _velocity;
         }
 
         public bool IsJumpPressed()
@@ -39,7 +40,7 @@ namespace MyGame.Services
 
         public bool IsShootPressed()
         {
-            return _currentMouseState.LeftButton == ButtonState.Pressed;
+            return _currentMouseState.LeftButton == ButtonState.Pressed && _previousMouseState.LeftButton == ButtonState.Released;
         }
 
         public bool IsReloadPressed()

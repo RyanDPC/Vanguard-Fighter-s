@@ -8,14 +8,18 @@ namespace MyGame.Models
         public Rectangle Bounds { get; private set; }
         public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
-        private Texture2D _texture;
 
-        public Bullet(Texture2D texture, Vector2 position, Vector2 velocity)
+        public int Damage { get; private set; }
+        private Texture2D _texture;
+        private Texture2D circleTexture;
+
+        public Bullet(Texture2D texture, Vector2 position, Vector2 velocity, int damage)
         {
             _texture = texture;
             Position = position;
             Velocity = velocity;
-            Bounds = new Rectangle((int)position.X, (int)position.Y, 10, 5); // Taille de la balle
+            Damage = damage;
+            Bounds = new Rectangle((int)position.X, (int)position.Y, 50, 50); // Taille de la balle
         }
 
         public void Update(GameTime gameTime)
@@ -34,9 +38,9 @@ namespace MyGame.Models
         }
 
         // Vérifier si la balle est hors de l'écran
-        public bool IsOffScreen()
+        public bool IsOffScreen(int screenWidth, int screenHeight)
         {
-            return (Position.X < 0 || Position.X > 1920 || Position.Y < 0 || Position.Y > 1080); // Adapter la taille de l'écran
+            return (Position.X < 0 || Position.X > screenWidth || Position.Y < 0 || Position.Y > screenHeight); // Adapter la taille de l'écran
         }
     }
 }

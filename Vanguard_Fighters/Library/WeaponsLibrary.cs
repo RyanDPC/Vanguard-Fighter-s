@@ -132,20 +132,19 @@ namespace MyGame.Library
             if (weapons.ContainsKey(weaponIndex))
             {
                 WeaponStats weaponStats = weapons[weaponIndex];
-                Weapon weapon = new Weapon(weaponStats, texture);
+                Weapon weapon = new Weapon(weaponStats);
             }
         }
-        public void TestWeapons(Texture2D bulletTexture)
+        public void TestWeapons(GameTime gameTime)
         {
             foreach (var weaponStats in weapons.Values)
             {
                 // Créer une instance de Weapon avec les stats et une texture fictive
-                Weapon weapon = new Weapon(weaponStats, bulletTexture);
+                Weapon weapon = new Weapon(weaponStats);
 
                 // Tester les méthodes de l'arme
-                weapon.Shoot(bulletTexture, new Vector2(0, 0), new Vector2(1, 0));
-                weapon.Reload();
-                weapon.UseSpecialAbility();
+                weapon.Shoot(new Vector2(0, 0), new Vector2(1, 0), gameTime);
+                weapon.Reload(gameTime);
                 // weapon.Reload(); -> Si tu implémentes le rechargement
                 // weapon.UseSpecialAbility(); -> Si la capacité spéciale est implémentée
             }
