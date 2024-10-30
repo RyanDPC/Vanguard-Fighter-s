@@ -4,6 +4,7 @@ using MyGame.Models;
 using MyGame.Library;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MyGame.Services;
 
 namespace MyGame.View
 {
@@ -15,7 +16,9 @@ namespace MyGame.View
         public bool IsFacingRight { get => _isFacingRight; set => _isFacingRight = value; }
         public float Scale { get => _scale; set => _scale = value; }
         public Vector2 WeaponOffset { get => _weaponOffset; set => _weaponOffset = value; }
-
+        
+        
+        private InputManager inputManager;
         private Weapon _weapon;
         private Vector2 _position;
         private bool _isFacingRight;
@@ -35,11 +38,11 @@ namespace MyGame.View
 
         public void Update(Vector2 Position, bool isFacingRight)
         {
-           this.Position = Position + WeaponOffset;
-           this.IsFacingRight = isFacingRight;
+            this.Position = Position + WeaponOffset;
+            this.IsFacingRight = isFacingRight;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+            public void Draw(SpriteBatch spriteBatch)
         {
             SpriteEffects spriteEffect = IsFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             spriteBatch.Draw(Weapon.Texture, Position, null, Color.White, 0f, Vector2.Zero,0.130f, spriteEffect, 0f);
