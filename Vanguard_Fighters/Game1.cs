@@ -9,8 +9,16 @@ using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended.Tiled;
 using System;
 
+
 namespace Vanguard_Fighters
 {
+    public enum GameState
+    {
+        MainMenu,
+        Playing,
+        GameOver,
+        GameWin
+    }
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -30,7 +38,9 @@ namespace Vanguard_Fighters
         private EnemyLibrary enemyLibrary;
         private int screenWidth;
         private int screenHeight;
-
+        Vector2 weaponOffset = new Vector2(0, 40);
+        List<Texture2D> skins = new List<Texture2D>();
+        private List<Bullet> bullets;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -49,7 +59,10 @@ namespace Vanguard_Fighters
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             inputManager = new InputManager();
-            WeaponsLibrary = new WeaponsLibrary(Content);
+            WeaponsLibrary = new WeaponsLibrary(Content, GraphicsDevice);
+            bullets = new List<Bullet>();
+            Bullet.InitializeTexture(GraphicsDevice);
+
 
             // Charger les cartes et backgrounds
             LoadMapsAndBackgrounds();
@@ -84,9 +97,9 @@ namespace Vanguard_Fighters
             Texture2D weaponTexture = Content.Load<Texture2D>("Weapons/Ion_Rifle");
             // Initialiser l'arme
             WeaponStats weaponStat = weaponLibrary.GetWeapon(2); // Exemple: "Tactical Pistol"
-            weapon = new MyGame.Models.Weapon(weaponStat, weaponTexture);
-            Vector2 weaponOffset = new Vector2(0, 40);
-            WeaponView weaponView = new WeaponView(weapon,new Vector2(100, 100), true, 0.5f, weaponOffset);
+            weapon = new MyGame.Models.Weapon(weaponStat, weaponOffset);
+            
+            WeaponView weaponView = new WeaponView(weapon,new Vector2(100, 100), true, 1f, weaponOffset);
         }
 
         private void LoadPlayer()
@@ -95,15 +108,16 @@ namespace Vanguard_Fighters
             screenHeight = _graphics.PreferredBackBufferHeight;
 
             // Charger la texture du joueur
-            Texture2D playerTexture = Content.Load<Texture2D>("Players/SpecialistFace");
-            if (playerTexture == null)
+            skins.Add(Content.Load <Texture2D>( "Players/SpecialistFace"));
+
+            if (skins == null)
             {
                 Console.WriteLine("Erreur : La texture du joueur n'a pas pu être chargée.");
             }
 
             // Initialiser le modèle et la vue du joueur
             Vector2 playerInitialPosition = new Vector2(
-                (GraphicsDevice.PresentationParameters.BackBufferWidth - 64) / 2,
+                (GraphicsDevice.PresentationParameters.BackBufferWidth -68 ),
                 GraphicsDevice.PresentationParameters.BackBufferHeight - 128
             );
 
@@ -111,7 +125,7 @@ namespace Vanguard_Fighters
             playerModel = new MyGame.Models.Player(playerInitialPosition, screenWidth, screenHeight, weapon);
 
             // Vue du joueur (affichage)
-            playerView = new MyGame.View.Player(playerTexture, weapon, playerInitialPosition, true);
+            playerView = new MyGame.View.Player(skins, weapon, playerInitialPosition, true, 1f, weaponOffset );
         }
 
         private void LoadEnemies()
@@ -131,13 +145,17 @@ namespace Vanguard_Fighters
         protected override void Update(GameTime gameTime)
         {
             inputManager.Update();
-
+            if (inputManager.IsShootPressed()) // Ajoutez une condition pour tirer
+            {
+                playerModel.Shoot();
+            }
             // Basculer en plein écran avec la touche Escape
             if (inputManager.IsEscapePressed())
             {
                 _graphics.IsFullScreen = !_graphics.IsFullScreen;
                 _graphics.ApplyChanges();
             }
+            
 
             // Mettre à jour la carte
             _mapRenderer.Update(gameTime);
@@ -146,7 +164,7 @@ namespace Vanguard_Fighters
             playerModel.Update(gameTime, inputManager, currentMap);
 
             // Mettre à jour la vue du joueur (position et direction)
-            playerView.Update(playerModel.Position, playerModel.Velocity.X >= 0);
+            playerView.Update(playerModel.Position, inputManager);
 
             // Mettre à jour les ennemis
             enemyLibrary.UpdateEnemies(gameTime, playerModel.Position, GraphicsDevice, currentMap);
@@ -159,15 +177,18 @@ namespace Vanguard_Fighters
 
         private void HandleBulletCollisions()
         {
-            foreach (var bullet in playerModel.Weapon.Bullets)
+            foreach (var bullet in playerModel.GetBullets())
             {
-                if (bullet.Bounds.Intersects(enemy.GetEnemyRectangle()))
+                foreach (var enemy in enemyLibrary.GetEnemies())
                 {
-                    enemy.TakeDamage(1); // L'ennemi perd 1 point de vie
-
-                    if (!enemy.IsAlive)
+                    if (bullet.Bounds.Intersects(enemy.GetEnemyRectangle()))
                     {
-                        enemy.Die();
+                        enemy.TakeDamage(bullet.Damage); // Infligez les dégâts de la balle à l'ennemi
+
+                        if (!enemy.IsAlive)
+                        {
+                            enemy.Die();
+                        }
                     }
                 }
             }
@@ -184,7 +205,10 @@ namespace Vanguard_Fighters
             {
                 _spriteBatch.Draw(currentBackground, Vector2.Zero, Color.White);
             }
-
+            foreach (var bullet in playerModel.GetBullets())
+            {
+                bullet.Draw(_spriteBatch);
+            }
             _spriteBatch.End();
 
             // Dessiner la carte

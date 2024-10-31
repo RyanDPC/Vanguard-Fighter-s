@@ -11,6 +11,8 @@ namespace MyGame.Services
         private MouseState _currentMouseState;
         private MouseState _previousMouseState;
         private GraphicsDeviceManager _graphics;
+        private const float SPEED = 1f;
+        private bool isFacingRight = true;
 
         public void Update()
         {
@@ -24,22 +26,39 @@ namespace MyGame.Services
 
         public Vector2 GetMovement()
         {
-            Vector2 movement = Vector2.Zero;
-            if (_currentKeyState.IsKeyDown(Keys.W)) movement.Y -= 1;
-            if (_currentKeyState.IsKeyDown(Keys.S)) movement.Y += 1;
-            if (_currentKeyState.IsKeyDown(Keys.A)) movement.X -= 1;
-            if (_currentKeyState.IsKeyDown(Keys.D)) movement.X += 1;
-            return movement;
+            Vector2 _velocity = Vector2.Zero;
+            if (_currentKeyState.IsKeyDown(Keys.W)) _velocity.Y -= SPEED;
+            if (_currentKeyState.IsKeyDown(Keys.S)) _velocity.Y += SPEED;
+
+            // Vérifie l'appui sur A ou D pour l'orientation
+            if (_currentKeyState.IsKeyDown(Keys.A))
+            {
+                _velocity.X -= SPEED;
+                isFacingRight = false; // Le joueur regarde à gauche
+            }
+            else if (_currentKeyState.IsKeyDown(Keys.D))
+            {
+                _velocity.X += SPEED;
+                isFacingRight = true; // Le joueur regarde à droite
+            }
+
+            return _velocity;
         }
 
-        public bool IsJumpPressed()
+        public bool IsFacingRight()
+        {
+            return isFacingRight;
+        }
+    
+
+    public bool IsJumpPressed()
         {
             return _currentKeyState.IsKeyDown(Keys.Space) && _previousKeyState.IsKeyUp(Keys.Space);
         }
 
         public bool IsShootPressed()
         {
-            return _currentMouseState.LeftButton == ButtonState.Pressed;
+            return _currentMouseState.LeftButton == ButtonState.Pressed && _previousMouseState.LeftButton == ButtonState.Released;
         }
 
         public bool IsReloadPressed()
@@ -51,15 +70,15 @@ namespace MyGame.Services
         {
             switch (weaponNumber)
             {
-                case 1: return _currentKeyState.IsKeyDown(Keys.D1);
-                case 2: return _currentKeyState.IsKeyDown(Keys.D2);
-                case 3: return _currentKeyState.IsKeyDown(Keys.D3);
-                case 4: return _currentKeyState.IsKeyDown(Keys.D4);
-                case 5: return _currentKeyState.IsKeyDown(Keys.P);
-                case 6: return _currentKeyState.IsKeyDown(Keys.D6);
-                case 7: return _currentKeyState.IsKeyDown(Keys.D7);
-                case 8: return _currentKeyState.IsKeyDown(Keys.D8);
-                case 9: return _currentKeyState.IsKeyDown(Keys.D9);
+                case 1: return _currentKeyState.IsKeyDown(Keys.NumPad1);
+                case 2: return _currentKeyState.IsKeyDown(Keys.NumPad2);
+                case 3: return _currentKeyState.IsKeyDown(Keys.NumPad3);
+                case 4: return _currentKeyState.IsKeyDown(Keys.NumPad4);
+                case 5: return _currentKeyState.IsKeyDown(Keys.NumPad5);
+                case 6: return _currentKeyState.IsKeyDown(Keys.NumPad6);
+                case 7: return _currentKeyState.IsKeyDown(Keys.NumPad7);
+                case 8: return _currentKeyState.IsKeyDown(Keys.NumPad8);
+                case 9: return _currentKeyState.IsKeyDown(Keys.NumPad9);
 
                 default: return false;
             }
