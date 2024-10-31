@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended.Tiled;
 using System;
-using Vanguard_Fighters.Services;
 
 namespace Vanguard_Fighters
 {
@@ -24,18 +23,14 @@ namespace Vanguard_Fighters
         private List<TiledMap> maps;
         private List<Texture2D> backgrounds;
         private Texture2D currentBackground;
-        private Texture2D circleTexture;
         private TiledMap currentMap;
         private Weapon weapon;
         private WeaponView weapons;
         private WeaponsLibrary WeaponsLibrary;
         private EnemyLibrary enemyLibrary;
-        private Cercle Cercle
         private int screenWidth;
         private int screenHeight;
-        Vector2 weaponOffset = new Vector2(0, 40);
-        List<Texture2D> skins = new List<Texture2D>();
-        Bullet bullet = new Bullet(cirecleTexture, position, velocity)
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -55,7 +50,6 @@ namespace Vanguard_Fighters
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             inputManager = new InputManager();
             WeaponsLibrary = new WeaponsLibrary(Content);
-            circleTexture =  Cercle.CreateCircleTexture(GraphicsDevice, 10 ,Color.Red);
 
             // Charger les cartes et backgrounds
             LoadMapsAndBackgrounds();
@@ -90,9 +84,9 @@ namespace Vanguard_Fighters
             Texture2D weaponTexture = Content.Load<Texture2D>("Weapons/Ion_Rifle");
             // Initialiser l'arme
             WeaponStats weaponStat = weaponLibrary.GetWeapon(2); // Exemple: "Tactical Pistol"
-            weapon = new MyGame.Models.Weapon(weaponStat);
-            
-            WeaponView weaponView = new WeaponView(weapon,new Vector2(100, 100), true, 1f, weaponOffset);
+            weapon = new MyGame.Models.Weapon(weaponStat, weaponTexture);
+            Vector2 weaponOffset = new Vector2(0, 40);
+            WeaponView weaponView = new WeaponView(weapon,new Vector2(100, 100), true, 0.5f, weaponOffset);
         }
 
         private void LoadPlayer()
@@ -101,16 +95,15 @@ namespace Vanguard_Fighters
             screenHeight = _graphics.PreferredBackBufferHeight;
 
             // Charger la texture du joueur
-            skins.Add(Content.Load <Texture2D>( "Players/SpecialistFace"));
-
-            if (skins == null)
+            Texture2D playerTexture = Content.Load<Texture2D>("Players/SpecialistFace");
+            if (playerTexture == null)
             {
                 Console.WriteLine("Erreur : La texture du joueur n'a pas pu être chargée.");
             }
 
             // Initialiser le modèle et la vue du joueur
             Vector2 playerInitialPosition = new Vector2(
-                (GraphicsDevice.PresentationParameters.BackBufferWidth -68 ),
+                (GraphicsDevice.PresentationParameters.BackBufferWidth - 64) / 2,
                 GraphicsDevice.PresentationParameters.BackBufferHeight - 128
             );
 
@@ -118,7 +111,7 @@ namespace Vanguard_Fighters
             playerModel = new MyGame.Models.Player(playerInitialPosition, screenWidth, screenHeight, weapon);
 
             // Vue du joueur (affichage)
-            playerView = new MyGame.View.Player(skins, weapon, playerInitialPosition, true, 1f, weaponOffset );
+            playerView = new MyGame.View.Player(playerTexture, weapon, playerInitialPosition, true);
         }
 
         private void LoadEnemies()
@@ -145,7 +138,6 @@ namespace Vanguard_Fighters
                 _graphics.IsFullScreen = !_graphics.IsFullScreen;
                 _graphics.ApplyChanges();
             }
-            
 
             // Mettre à jour la carte
             _mapRenderer.Update(gameTime);
@@ -167,18 +159,15 @@ namespace Vanguard_Fighters
 
         private void HandleBulletCollisions()
         {
-            foreach (var bullet in playerModel.GetBullets())
+            foreach (var bullet in playerModel.Weapon.Bullets)
             {
-                foreach (var enemy in enemyLibrary.GetEnemies())
+                if (bullet.Bounds.Intersects(enemy.GetEnemyRectangle()))
                 {
-                    if (bullet.Bounds.Intersects(enemy.GetEnemyRectangle()))
-                    {
-                        enemy.TakeDamage(bullet.Damage); // Infligez les dégâts de la balle à l'ennemi
+                    enemy.TakeDamage(1); // L'ennemi perd 1 point de vie
 
-                        if (!enemy.IsAlive)
-                        {
-                            enemy.Die();
-                        }
+                    if (!enemy.IsAlive)
+                    {
+                        enemy.Die();
                     }
                 }
             }
