@@ -1,120 +1,90 @@
-﻿
-using System;
-using MyGame.Library;
-using MyGame.View;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MyGame.Services;
+using System;
 
 namespace MyGame.Models
 {
     public class Weapon
     {
-        public WeaponStats Stats { get; private set; } // Stocke les caractéristiques de l'arme
-        public Texture2D WeaponTexture { get; private set; } // Texture de l'arme
-        public List<Bullet> Bullets { get; private set; } // Liste des projectiles
+        public int Ammo { get; private set; }
+        public int MaxAmmo { get; }
+        public int Damage { get; }
+        public float FireRate { get; }
+        public float Range { get; }
+        public float ReloadTime { get; }
+        public string SpecialAbility { get; }
+        public Texture2D Texture { get; }
+        public float Speed { get; }
+        public Vector2 WeaponOffset { get; set; } // Ajout pour la position de départ des balles
 
-        private float timeSinceLastShot; // Temps écoulé depuis le dernier tir
-        private float reloadTimer; // Timer pour le rechargement
-        private float timeSinceLastSpecial; // Temps écoulé depuis la dernière utilisation de la capacité spéciale
-        private bool isReloading; // Indique si l'arme est en train de recharger
+        private float lastShotTime;
+        private bool isReloading;
+        private float reloadStartTime;
+        private bool IsFacingRight;
 
-        public Weapon(WeaponStats stats, Texture2D texture)
+        public Weapon(WeaponStats stats, Vector2 weaponOffset)
         {
-
-            Stats = stats;
-            WeaponTexture = texture;
-            Bullets = new List<Bullet>();
-            timeSinceLastShot = 0f;
-            reloadTimer = Stats.ReloadTime;
-            timeSinceLastSpecial = Stats.FireCooldown;
+            MaxAmmo = stats.MaxAmmo;
+            Ammo = stats.ClipSize;
+            Damage = stats.Damage;
+            FireRate = stats.FireCooldown;
+            Range = stats.Range;
+            ReloadTime = stats.ReloadTime;
+            SpecialAbility = stats.Ability;
+            Texture = stats.WeaponTexture;
+            Speed = stats.Speed;
+            WeaponOffset = weaponOffset;
+            lastShotTime = 0;
             isReloading = false;
         }
-        public void Update(GameTime gameTime)
-        {
-            float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            // Si l'arme est en cours de rechargement
-            if (isReloading)
+        public Bullet Shoot(Vector2 position, Vector2 direction, GameTime gameTime, Texture2D bulletTexture)
+        {
+            if (isReloading) return null;
+
+            if (Ammo > 0 && gameTime.TotalGameTime.TotalSeconds - lastShotTime >= 1 / FireRate)
             {
-                reloadTimer += elapsedSeconds;
-                if (reloadTimer >= Stats.ReloadTime)
-                {
-                    Console.WriteLine($"{Stats.Name} is reloaded.");
-                    isReloading = false;
-                    reloadTimer = 0;
-                }
-            }
-            timeSinceLastShot += elapsedSeconds;
+                lastShotTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                Ammo--;
 
-            // Mise à jour du cooldown de la capacité spéciale
-            timeSinceLastSpecial += elapsedSeconds;
-        }
-        public bool CanShoot()
-        {
-            return !isReloading && Stats.MaxAmmo > 0 && timeSinceLastShot >= (1 / Stats.Range);
+                // Ajouter WeaponOffset pour positionner la balle au bout de l'arme
+                Vector2 bulletStartPosition = position + WeaponOffset * (IsFacingRight ? 1 : -1);
+                Vector2 bulletVelocity = direction * Speed;
+
+                return new Bullet(bulletStartPosition, bulletVelocity, Damage, IsFacingRight, WeaponOffset, Speed);
+            }
+            return null;
         }
 
-        public void Shoot(Texture2D bulletTexture, Vector2 position, Vector2 direction)
+
+
+        public void Reload(GameTime gameTime)
         {
-            if (CanShoot())
-            {
-                // Crée un projectile
-                Bullet bullet = new Bullet(bulletTexture, position, direction);
-                Bullets.Add(bullet);
-
-                // Réinitialise le cooldown du tir
-                timeSinceLastShot = 0;
-                Stats.MaxAmmo--;
-
-                Console.WriteLine($"{Stats.Name} shoots. Remaining ammo: {Stats.MaxAmmo}");
-            }
-            else
-            {
-                Console.WriteLine($"{Stats.Name} cannot shoot. Either reloading or out of ammo.");
-            }
-        }
-
-        public void Reload()
-        {
-            if (!isReloading && Stats.MaxAmmo < Stats.ClipSize)
+            if (!isReloading)
             {
                 isReloading = true;
-                reloadTimer = 0;
-                Console.WriteLine($"{Stats.Name} is reloading...");
-            }
-        }
-        public void UseSpecialAbility()
-        {
-            if (timeSinceLastSpecial >= Stats.FireCooldown)
-            {
-                timeSinceLastSpecial = 0;
-                Console.WriteLine($"{Stats.Name} uses special ability: {Stats.Ability}");
+                reloadStartTime = (float)gameTime.TotalGameTime.TotalSeconds;
             }
             else
             {
-                Console.WriteLine($"{Stats.Name} cannot use special ability yet.");
+                if ((float)gameTime.TotalGameTime.TotalSeconds - reloadStartTime >= ReloadTime)
+                {
+                    Ammo = MaxAmmo;
+                    isReloading = false;
+                }
             }
         }
-        public void SetWeaponTexture(Texture2D texture)
-        {
-            WeaponTexture = texture;
-        }
-        public void UpdateBullets(GameTime gameTime)
-        {
-            foreach (var bullet in Bullets)
-            {
-                bullet.Update(gameTime);
-            }
 
-            // Retirer les balles hors écran
-            Bullets.RemoveAll(b => b.IsOffScreen());
-        }
-        public void DrawBullets(SpriteBatch spriteBatch)
+        public void ActivateSpecialAbility()
         {
-            foreach (var bullet in Bullets)
+            if (SpecialAbility == "Automatic burst with slight accuracy loss")
             {
-                bullet.Draw(spriteBatch);
+                // Implémenter l'effet spécial ici
+            }
+            else if (SpecialAbility == "Fast reload")
+            {
+                // Exemple : Réduire temporairement le temps de rechargement
             }
         }
     }
