@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MyGame.Services;
 
 namespace MyGame.Models
 {
@@ -9,53 +8,35 @@ namespace MyGame.Models
         public Rectangle Bounds { get; private set; }
         public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
-        public int Damage { get; private set; }
-        private static Texture2D bulletTexture;
-        private SpriteEffects spriteEffect;
-        private float speed;
-        private int width = 10; // Largeur du rectangle
-        private int height = 5; // Hauteur du rectangle
+        private Texture2D _texture;
 
-        // Constructeur avec orientation et offset de l'arme
-        public Bullet(Vector2 position, Vector2 velocity, int damage, bool isFacingRight, Vector2 weaponOffset, float speed)
+        public Bullet(Texture2D texture, Vector2 position, Vector2 velocity)
         {
-            Position = position + weaponOffset; // Ajoute l'offset de l'arme à la position initiale
+            _texture = texture;
+            Position = position;
             Velocity = velocity;
-            Damage = damage;
-            this.speed = speed;
-            Bounds = new Rectangle((int)Position.X, (int)Position.Y, width, height);
-            spriteEffect = isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-        }
-
-
-        // Initialisation de la texture
-        public static void InitializeTexture(GraphicsDevice graphicsDevice)
-        {
-            if (bulletTexture == null)
-            {
-                bulletTexture = new Texture2D(graphicsDevice, 1, 1);
-                bulletTexture.SetData(new[] { Color.Red });
-            }
+            Bounds = new Rectangle((int)position.X, (int)position.Y, 10, 5); // Taille de la balle
         }
 
         public void Update(GameTime gameTime)
         {
-            // Applique la vitesse multipliée par le temps écoulé
-            Position += Velocity * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            // Calculer la nouvelle position en fonction de la vitesse
+            Position += Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            // Mettre à jour les limites de la balle pour les collisions
-            Bounds = new Rectangle((int)Position.X, (int)Position.Y, width, height);
+            // Mettre à jour le Rectangle des collisions
+            Bounds = new Rectangle((int)Position.X, (int)Position.Y, Bounds.Width, Bounds.Height);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Dessiner la balle avec l'orientation
-            spriteBatch.Draw(bulletTexture, Position, null, Color.White, 0f, Vector2.Zero, 5f, spriteEffect, 0f);
+            // Dessiner le projectile (mini-rectangle)
+            spriteBatch.Draw(_texture, Bounds, Color.Red);
         }
 
-        public bool IsOffScreen(int screenWidth, int screenHeight)
+        // Vérifier si la balle est hors de l'écran
+        public bool IsOffScreen()
         {
-            return Position.X < 0 || Position.X > screenWidth || Position.Y < 0 || Position.Y > screenHeight;
+            return (Position.X < 0 || Position.X > 1920 || Position.Y < 0 || Position.Y > 1080); // Adapter la taille de l'écran
         }
     }
 }
