@@ -1,11 +1,11 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MyGame.Models;
 using MyGame.Services;
 using MonoGame.Extended.Tiled;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MyGame.Models
 {
@@ -23,10 +23,8 @@ namespace MyGame.Models
         private int screenWidth;
         private int screenHeight;
         private bool _isFacingRight;
-        private List<Bullet> bullets = new List<Bullet>();
+        private List<Bullet> bullets; // Liste des projectiles tirés
         private bool isReloading;
-        private float lastShotTime;
-        
 
         public Player(Vector2 initialPosition, int screenWidth, int screenHeight, Weapon initialWeapon)
         {
@@ -36,25 +34,25 @@ namespace MyGame.Models
             Weapon = initialWeapon;
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
-            _isFacingRight = false; // Le joueur regarde par défaut à gauche
+            _isFacingRight = true; // Le joueur regarde par défaut à droite
             IsOnGround = false;
+            bullets = new List<Bullet>();
             isReloading = false;
-            lastShotTime = 0f;
         }
 
+        // Mise à jour de la position, des mouvements et des tirs
         public void Update(GameTime gameTime, InputManager inputManager, TiledMap map)
         {
             ApplyGravity(gameTime);
             HandleMovement(inputManager);
             CheckCollisions(map);
             UpdatePosition(gameTime);
-            UpdateBullets(gameTime);
+            UpdateBullets(gameTime); // Mise à jour des projectiles
 
             // Gestion du tir
-            if (inputManager.IsShootPressed() && gameTime.TotalGameTime.TotalSeconds - lastShotTime >= 1 / Weapon.FireRate)
+            if (inputManager.IsShootPressed() && !isReloading)
             {
-                Shoot();
-                lastShotTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                Shoot(gameTime);
             }
 
             // Gestion du rechargement
@@ -83,11 +81,6 @@ namespace MyGame.Models
             Vector2 movement = inputManager.GetMovement();
             Velocity = new Vector2(movement.X * 300, Velocity.Y);
 
-            // Changer l'orientation en fonction des touches A et D
-            if (movement.X > 0) _isFacingRight = true;
-            else if (movement.X < 0) _isFacingRight = false;
-
-            // Gestion du saut
             if (inputManager.IsJumpPressed() && IsOnGround)
             {
                 Velocity = new Vector2(Velocity.X, JumpStrength);
@@ -130,18 +123,17 @@ namespace MyGame.Models
         }
 
         // Méthode pour tirer avec l'arme équipée
-        public void Shoot()
+        public void Shoot(GameTime gameTime)
         {
-            Vector2 direction = _isFacingRight ? Vector2.UnitX : -Vector2.UnitX;
-            Vector2 bulletVelocity = direction * Weapon.Speed;
-            Bullet bullet = new Bullet(Position, bulletVelocity, Weapon.Damage, _isFacingRight, Weapon.WeaponOffset, Weapon.Speed);
-            bullets.Add(bullet);
+            Vector2 direction = new Vector2(_isFacingRight ? 1 : -1, 0);
+            Bullet bullet = Weapon.Shoot(Position, direction, gameTime);
+
+            if (bullet != null)
+            {
+                bullets.Add(bullet); // Ajouter le projectile à la liste des projectiles
+            }
         }
 
-        public List<Bullet> GetBullets()
-        {
-            return bullets;
-        }
         // Démarrer le rechargement
         private void StartReloading(GameTime gameTime)
         {
@@ -166,31 +158,39 @@ namespace MyGame.Models
 
                 if (bullets[i].IsOffScreen(screenWidth, screenHeight))
                 {
-                    bullets.RemoveAt(i);
+                    bullets.RemoveAt(i); // Supprimer le projectile s'il est hors de l'écran
                 }
             }
         }
+        public List<Bullet> GetBullets()
+        {
+            return bullets;
+        }
 
+        // Dessine le joueur et ses projectiles
         public void Draw(SpriteBatch spriteBatch)
         {
-            SpriteEffects effect = _isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            spriteBatch.Draw(Weapon.Texture, Position, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
+            // Dessiner le joueur (utilisez une texture de joueur)
+            spriteBatch.Draw(Weapon.Texture, Position, Color.White);
 
+            // Dessiner les projectiles
             foreach (var bullet in bullets)
             {
                 bullet.Draw(spriteBatch);
             }
         }
 
+        // Méthode pour changer d'arme
         public void ChangeWeapon(Weapon newWeapon)
         {
             Weapon = newWeapon;
-            isReloading = false;
+            isReloading = false; // Arrêter le rechargement si on change d'arme
         }
 
+        // Méthode pour gérer les dégâts reçus
         public void TakeDamage(int damage)
         {
-            Health -= Weapon.Damage;
+            Health -= damage;
             if (Health <= 0)
             {
                 Health = 0;
@@ -198,10 +198,11 @@ namespace MyGame.Models
             }
         }
 
+        // Gérer la mort du joueur
         private async void Die()
         {
             Console.WriteLine("Player is dead.");
-            await Task.Delay(10000);
+            await Task.Delay(10000); // Attendre 10 secondes
             Environment.Exit(0);
         }
     }

@@ -13,9 +13,8 @@ namespace MyGame.Models
         public int ClipSize { get; private set; }
         public string Ability {  get; private set; }
         public Texture2D WeaponTexture { get; private set; }
-        public float Speed { get; private set; }
 
-        public WeaponStats(string name, int damage, float fireCooldown, int maxAmmo, int clipSize,float range,float reloadTime, string ability, Texture2D texture, float speed)
+        public WeaponStats(string name, int damage, float fireCooldown, int maxAmmo, int clipSize,float range,float reloadTime, string ability, Texture2D texture)
         {
             Name = name;
             Damage = damage;
@@ -26,7 +25,6 @@ namespace MyGame.Models
             ReloadTime = reloadTime;
             Ability = ability;
             WeaponTexture = texture;
-            Speed = speed;
         }
     }
 }
