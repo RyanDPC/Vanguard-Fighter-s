@@ -113,7 +113,7 @@ namespace Vanguard_Fighters
         private void LoadEnemies(ContentManager content)
         {
             Texture2D enemyTexture = content.Load<Texture2D>("Players/WukongEntier");
-            enemyLibrary = new EnemyLibrary(enemyTexture,bullet. );
+            enemyLibrary = new EnemyLibrary(enemyTexture,bullet.);
 
             // Positionner les ennemis en tenant compte de l'échelle
             enemyLibrary.AddEnemy(new Vector2(500, 100) * scaleFactor);
@@ -157,7 +157,7 @@ namespace Vanguard_Fighters
             _mapRenderer.Draw(Matrix.CreateScale(scaleFactor));
 
             _spriteBatch.Begin();
-            playerView.Draw(_spriteBatch, scaleFactor);
+            playerView.Draw(_spriteBatch,playerModel, scaleFactor);
             enemyLibrary.DrawEnemies(_spriteBatch, scaleFactor);
             _spriteBatch.End();
         }

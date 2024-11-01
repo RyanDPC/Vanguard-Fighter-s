@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MyGame.Models;
 using MyGame.View;
+using System;
 using Vanguard_Fighters.Library;
 
 namespace MyGame.View
@@ -42,13 +43,27 @@ namespace MyGame.View
             var weaponDestinationRectangle = new Rectangle(
                 (int)(weaponPosition.X),
                 (int)(weaponPosition.Y),
-                (int)(_weaponStats.WeaponTexture.Width* _scaleFactor),
+                (int)(_weaponStats.WeaponTexture.Width * _scaleFactor),
                 (int)(_weaponStats.WeaponTexture.Height * _scaleFactor)
             );
 
             SpriteEffects spriteEffects = playerModel.IsFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-            spriteBatch.Draw(_weaponStats.WeaponTexture,weaponPosition,weaponDestinationRectangle, Color.White,,0f, Vector2.Zero, spriteEffects, 0f);
+            // Ajoutez une variable rotation pour contrôler l'angle de l'arme
+            float rotation = 0f; // Vous pouvez calculer cette valeur en fonction de la logique de votre jeu
+
+            spriteBatch.Draw(
+                _weaponStats.WeaponTexture,       // Texture de l'arme
+                weaponPosition,                   // Position de l'arme
+                null,                             // Source rectangle (null pour dessiner l'image entière)
+                Color.White,                      // Couleur
+                rotation,                         // Rotation de l'arme
+                Vector2.Zero,                     // Point d'origine de la rotation
+                _scaleFactor,                     // Échelle
+                spriteEffects,                    // Effets pour flip
+                0f                                // Profondeur
+            );
         }
+
     }
 }
