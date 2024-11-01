@@ -1,61 +1,62 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
+using MyGame.Models;
+using MyGame.View;
+using System;
 using System.Collections.Generic;
 
-namespace MyGame.Models
+namespace MyGame.Library
 {
     public class EnemyLibrary
     {
-        private List<Enemy> _enemies;
-        private Texture2D _enemyTexture;
-        private int currentEnemyIndex = 0; 
+        private List<EnemyModel> _enemies;
+        private EnemyView _enemyView;
+        private Vector2 weaponOffset = new Vector2(0, 40); // Offset pour l'arme de l'ennemi
 
-        public EnemyLibrary(Texture2D enemyTexture)
+        public EnemyLibrary(Texture2D enemyTexture, Texture2D bulletTexture)
         {
-            _enemies = new List<Enemy>();
-            _enemyTexture = enemyTexture;
+            _enemies = new List<EnemyModel>();
+            _enemyView = new EnemyView(enemyTexture);
         }
 
-        public void AddEnemy(Vector2 initialPosition)
+        public void AddEnemy(Vector2 position)
         {
-            Enemy newEnemy = new Enemy(_enemyTexture, initialPosition);
-            _enemies.Add(newEnemy);
+            // Initialiser chaque ennemi avec un Tactical Pistol (ID: 9)
+            var tacticalPistol = new Weapon(9, weaponOffset);
+            _enemies.Add(new EnemyModel(position, tacticalPistol));
         }
 
-        public void UpdateEnemies(GameTime gameTime, Vector2 playerPosition, GraphicsDevice graphicsDevice, TiledMap tiledMap)
+        public void UpdateEnemies(GameTime gameTime, Vector2 playerPosition, TiledMap tiledMap, float scaleFactor)
         {
-            if (_enemies.Count == 0) return;
-            var currentEnemy = _enemies[currentEnemyIndex];
-            if (currentEnemy.IsAlive)
+            foreach (var enemy in _enemies)
             {
-                currentEnemy.MoveTowardsPlayer(playerPosition, gameTime, graphicsDevice, tiledMap);
-            }
-            else
-            {
-                // Si l'ennemi est mort, passer à l'ennemi suivant
-                currentEnemyIndex++;
-
-                // Vérifier si on a atteint la fin de la liste des ennemis
-                if (currentEnemyIndex >= _enemies.Count)
+                if (enemy.IsAlive)
                 {
-                    currentEnemyIndex = _enemies.Count - 1; // Reste sur le dernier ennemi si tous sont morts
+                    enemy.MoveTowardsPlayer(playerPosition, gameTime, tiledMap);
+
+                    // Vérifie si l'ennemi est sur la même ligne horizontale que le joueur pour tirer
+                    if (Math.Abs(enemy.Position.Y - playerPosition.Y) < 50) // Ajuster la tolérance selon besoin
+                    {
+                        enemy.Shoot(playerPosition, gameTime); // L'ennemi tire s'il est en ligne avec le joueur
+                    }
                 }
             }
         }
-        public void DrawEnemies(SpriteBatch spriteBatch)
+
+        public void DrawEnemies(SpriteBatch spriteBatch, float scaleFactor)
         {
-            if (_enemies.Count == 0) return; // Aucun ennemi à dessiner
-
-            var currentEnemy = _enemies[currentEnemyIndex]; // Récupère l'ennemi actif
-
-            if (currentEnemy.IsAlive)
+            foreach (var enemy in _enemies)
             {
-                currentEnemy.Draw(spriteBatch);
+                if (enemy.IsAlive)
+                {
+                    _enemyView.Draw(spriteBatch, enemy.Position, enemy.IsFacingRight, scaleFactor);
+                    _enemyView.DrawWeapon(spriteBatch, enemy.Position, enemy.IsFacingRight, scaleFactor);
+                }
             }
         }
 
-        public List<Enemy> GetEnemies()
+        public List<EnemyModel> GetEnemies()
         {
             return _enemies;
         }

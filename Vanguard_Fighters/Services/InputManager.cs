@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System.Drawing;
+using MyGame.Models;
+using System;
 
 namespace MyGame.Services
 {
@@ -10,12 +11,15 @@ namespace MyGame.Services
         private KeyboardState _previousKeyState;
         private MouseState _currentMouseState;
         private MouseState _previousMouseState;
-        private GraphicsDeviceManager _graphics;
-        private const float SPEED = 1f;
         private bool isFacingRight = true;
+        private float timeSinceLastShot;
+        private float fireCooldown;
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
+            // Met à jour le temps écoulé depuis le dernier tir en secondes pour plus de précision
+            timeSinceLastShot += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             // Mise à jour des états des touches
             _previousKeyState = _currentKeyState;
             _currentKeyState = Keyboard.GetState();
@@ -26,39 +30,45 @@ namespace MyGame.Services
 
         public Vector2 GetMovement()
         {
-            Vector2 _velocity = Vector2.Zero;
-            if (_currentKeyState.IsKeyDown(Keys.W)) _velocity.Y -= SPEED;
-            if (_currentKeyState.IsKeyDown(Keys.S)) _velocity.Y += SPEED;
+            Vector2 velocity = Vector2.Zero;
+            const float speed = 1f;
+
+            if (_currentKeyState.IsKeyDown(Keys.W)) velocity.Y -= speed;
+            if (_currentKeyState.IsKeyDown(Keys.S)) velocity.Y += speed;
 
             // Vérifie l'appui sur A ou D pour l'orientation
             if (_currentKeyState.IsKeyDown(Keys.A))
             {
-                _velocity.X -= SPEED;
+                velocity.X -= speed;
                 isFacingRight = false; // Le joueur regarde à gauche
             }
             else if (_currentKeyState.IsKeyDown(Keys.D))
             {
-                _velocity.X += SPEED;
+                velocity.X += speed;
                 isFacingRight = true; // Le joueur regarde à droite
             }
 
-            return _velocity;
+            return velocity;
         }
 
-        public bool IsFacingRight()
-        {
-            return isFacingRight;
-        }
-    
+        public bool IsFacingRight() => isFacingRight;
 
-    public bool IsJumpPressed()
+        public bool IsJumpPressed()
         {
             return _currentKeyState.IsKeyDown(Keys.Space) && _previousKeyState.IsKeyUp(Keys.Space);
         }
 
         public bool IsShootPressed()
         {
-            return _currentMouseState.LeftButton == ButtonState.Pressed && _previousMouseState.LeftButton == ButtonState.Released;
+            // Vérifie si le bouton est pressé et si le cooldown est terminé
+            if (_currentMouseState.LeftButton == ButtonState.Pressed && timeSinceLastShot >= fireCooldown)
+            {
+                // Réinitialise le temps depuis le dernier tir pour appliquer le cooldown
+                timeSinceLastShot = 0f;
+                Console.WriteLine("Tir effectué"); // Debug
+                return true;
+            }
+            return false;
         }
 
         public bool IsReloadPressed()
@@ -68,30 +78,43 @@ namespace MyGame.Services
 
         public bool IsWeaponSwitchPressed(int weaponNumber)
         {
-            switch (weaponNumber)
+            return weaponNumber switch
             {
-                case 1: return _currentKeyState.IsKeyDown(Keys.NumPad1);
-                case 2: return _currentKeyState.IsKeyDown(Keys.NumPad2);
-                case 3: return _currentKeyState.IsKeyDown(Keys.NumPad3);
-                case 4: return _currentKeyState.IsKeyDown(Keys.NumPad4);
-                case 5: return _currentKeyState.IsKeyDown(Keys.NumPad5);
-                case 6: return _currentKeyState.IsKeyDown(Keys.NumPad6);
-                case 7: return _currentKeyState.IsKeyDown(Keys.NumPad7);
-                case 8: return _currentKeyState.IsKeyDown(Keys.NumPad8);
-                case 9: return _currentKeyState.IsKeyDown(Keys.NumPad9);
-
-                default: return false;
-            }
+                1 => _currentKeyState.IsKeyDown(Keys.Z),
+                2 => _currentKeyState.IsKeyDown(Keys.X),
+                3 => _currentKeyState.IsKeyDown(Keys.C),
+                4 => _currentKeyState.IsKeyDown(Keys.V),
+                5 => _currentKeyState.IsKeyDown(Keys.B),
+                6 => _currentKeyState.IsKeyDown(Keys.N),
+                7 => _currentKeyState.IsKeyDown(Keys.M),
+                8 => _currentKeyState.IsKeyDown(Keys.K),
+                9 => _currentKeyState.IsKeyDown(Keys.L),
+                _ => false,
+            };
         }
+
+
         public bool IsSpecialAbilityPressed()
         {
-            return _currentMouseState.RightButton == ButtonState.Pressed && _previousMouseState.RightButton==ButtonState.Released;
+            return _currentMouseState.RightButton == ButtonState.Pressed && _previousMouseState.RightButton == ButtonState.Released;
         }
+
         public bool IsEscapePressed()
         {
-          
             return _currentKeyState.IsKeyDown(Keys.Escape) && _previousKeyState.IsKeyUp(Keys.Escape);
         }
-     
+
+        public void SetFireCooldown(Weapon weapon)
+        {
+            if (weapon != null)
+            {
+                fireCooldown = weapon.FireRate; // Utilise le FireRate de l'arme pour définir le cooldown
+                Console.WriteLine("fireCooldown défini sur : " + fireCooldown); // Debug
+            }
+            else
+            {
+                Console.WriteLine("Erreur : Arme non définie !");
+            }
+        }
     }
 }

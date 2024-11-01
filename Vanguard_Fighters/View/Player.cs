@@ -1,70 +1,54 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MyGame.Models;
-using MyGame.Services;
-using System.Collections.Generic;
+using MyGame.View;
+using Vanguard_Fighters.Library;
 
 namespace MyGame.View
 {
-    public class Player
+    public class PlayerView
     {
-        private List<Texture2D> _skins;
-        private int _currentSkinIndex;
-        private Vector2 _position;
-        private WeaponView _weaponView;
+        private Texture2D _playerTexture;
+        private Weapon _weapon;
+        private WeaponStats _weaponStats;
         private Vector2 _weaponOffset;
-        private float _scale;
-        private bool isFacingRight;
+        private float _scaleFactor;
 
-        public List<Texture2D> Skins { get => _skins; set => _skins = value; }
-        public int CurrentSkinIndex { get => _currentSkinIndex; set => _currentSkinIndex = value; }
-        public Vector2 Position { get => _position; set => _position = value; }
-        public WeaponView WeaponView { get => _weaponView; set => _weaponView = value; }
-        public Vector2 WeaponOffset { get => _weaponOffset; set => _weaponOffset = value; }
-        public float Scale { get => _scale; set => _scale = value; }
-
-        public Player(List<Texture2D> skins, Weapon weapon, Vector2 initialPosition, bool isFacingRight, float scale, Vector2 weaponOffset)
+        public PlayerView(Texture2D playerTexture, Weapon weapon, Vector2 weaponOffset, float scaleFactor)
         {
-            Skins = skins;
-            CurrentSkinIndex = 0;
-            Position = initialPosition;
-            Scale = scale;
-            WeaponOffset = weaponOffset;
-            WeaponView = new WeaponView(weapon, initialPosition, isFacingRight, Scale, WeaponOffset);
-            this.isFacingRight = isFacingRight;
+            _playerTexture = playerTexture;
+            _weapon = weapon;
+            _weaponOffset = weaponOffset;
+            _scaleFactor = scaleFactor;
         }
 
-        public void ChangeSkin(int change)
+        public void Draw(SpriteBatch spriteBatch, PlayerModel playerModel)
         {
-            CurrentSkinIndex += change;
-            if (CurrentSkinIndex >= Skins.Count) CurrentSkinIndex = 0;
-            else if (CurrentSkinIndex < 0) CurrentSkinIndex = Skins.Count - 1;
+            Vector2 playerPosition = playerModel.Position;
+            Rectangle playerDestinationRectangle = new Rectangle(
+                (int)(playerPosition.X),
+                (int)(playerPosition.Y),
+                (int)(68 * _scaleFactor),  // Ajuster la largeur selon l'échelle
+                (int)(128 * _scaleFactor)   // Ajuster la hauteur selon l'échelle
+            );
+
+            spriteBatch.Draw(_playerTexture, playerDestinationRectangle, Color.White);
+
+            DrawWeapon(spriteBatch, playerModel);
         }
-
-        // Met à jour la position et l'orientation en fonction de l'input
-        public void Update(Vector2 newPosition, InputManager inputManager)
+        private void DrawWeapon(SpriteBatch spriteBatch, PlayerModel playerModel)
         {
-            Position = newPosition;
+            Vector2 weaponPosition = playerModel.Position + _weaponOffset * _scaleFactor;
+            var weaponDestinationRectangle = new Rectangle(
+                (int)(weaponPosition.X),
+                (int)(weaponPosition.Y),
+                (int)(_weaponStats.WeaponTexture.Width* _scaleFactor),
+                (int)(_weaponStats.WeaponTexture.Height * _scaleFactor)
+            );
 
-            // Met à jour l'orientation selon l'input
-            if (inputManager.GetMovement().X > 0)
-                isFacingRight = true;
-            else if (inputManager.GetMovement().X < 0)
-                isFacingRight = false;
+            SpriteEffects spriteEffects = playerModel.IsFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-            WeaponView.Update(newPosition, isFacingRight);
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            // Utilise isFacingRight pour définir l'orientation
-            SpriteEffects spriteEffect = !isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-
-            // Dessine le skin du joueur avec l'orientation correcte
-            spriteBatch.Draw(Skins[CurrentSkinIndex], Position, null, Color.White, 0f, Vector2.Zero, 0.130f, spriteEffect, 0f);
-
-            // Dessine l'arme
-            WeaponView.Draw(spriteBatch);
+            spriteBatch.Draw(_weaponStats.WeaponTexture,weaponPosition,weaponDestinationRectangle, Color.White,roation ,0f, Vector2.Zero, spriteEffects, 0f);
         }
     }
 }

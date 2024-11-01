@@ -4,7 +4,7 @@ using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using System.Collections.Generic;
 
-namespace MyGame.Models
+namespace Vanguard_Fighters.View
 {
     public class Map
     {
@@ -21,7 +21,7 @@ namespace MyGame.Models
             _maps = maps;
             _backgrounds = backgrounds;
             _currentMapIndex = 0; // Commence avec la première carte et le premier fond
-            _currentBackground = _backgrounds[_currentMapIndex]; 
+            _currentBackground = _backgrounds[_currentMapIndex];
             _mapRenderer = new TiledMapRenderer(graphicsDevice, _maps[_currentMapIndex]);
         }
 
@@ -50,19 +50,19 @@ namespace MyGame.Models
 
         // Afficher le fond et la carte
         public void Draw(SpriteBatch spriteBatch)
-{
-    // Commencer un batch avant de dessiner le background
-    spriteBatch.Begin();  // Assurez-vous que Begin est appelé ici avant tout appel à Draw
+        {
+            // Commencer un batch avant de dessiner le background
+            spriteBatch.Begin();  // Assurez-vous que Begin est appelé ici avant tout appel à Draw
 
-    // Dessiner le fond
-    spriteBatch.Draw(_currentBackground, new Rectangle(0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height), Color.White);
+            // Dessiner le fond
+            spriteBatch.Draw(_currentBackground, new Rectangle(0, 0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height), Color.White);
 
-    // Terminer le batch pour le background
-    spriteBatch.End(); // Fin du premier bloc de dessin
+            // Terminer le batch pour le background
+            spriteBatch.End(); // Fin du premier bloc de dessin
 
-    // Maintenant, dessiner la carte Tiled
-    _mapRenderer.Draw();  // Le TiledMapRenderer gère son propre pipeline de rendu
-}
+            // Maintenant, dessiner la carte Tiled
+            _mapRenderer.Draw();  // Le TiledMapRenderer gère son propre pipeline de rendu
+        }
 
     }
 }

@@ -1,208 +1,131 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MyGame.Models;
-using MyGame.Services;
 using MonoGame.Extended.Tiled;
+using MyGame.Library;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MyGame.Models
 {
-    public class Player
+    public class PlayerModel
     {
-        public Vector2 Position { get; private set; }
-        public Vector2 Velocity { get; private set; }
-        public int Health { get; private set; }
-        public Weapon Weapon { get; private set; }
+        public Vector2 Position { get; set; }
+        public Vector2 Velocity { get; private set; } = Vector2.Zero;
+        public int Health { get; private set; } = 100;
+        public bool IsAlive => Health > 0;
+        public bool IsFacingRight { get; private set; } = true;
         public bool IsOnGround { get; private set; }
 
-        private const float Gravity = 1500f;
-        private const float JumpStrength = -600f;
-        private const int MaxHealth = 100;
-        private int screenWidth;
-        private int screenHeight;
-        private bool _isFacingRight;
-        private List<Bullet> bullets = new List<Bullet>();
-        private bool isReloading;
-        private float lastShotTime;
-        
+        private float speed = 150.0f; // Vitesse du joueur
+        private const int BaseWidth = 68; // Largeur du joueur
+        private const int BaseHeight = 128; // Hauteur du joueur
+        private float scaleFactor; // Facteur d'échelle
+        private const float Gravity = 980f;
 
-        public Player(Vector2 initialPosition, int screenWidth, int screenHeight, Weapon initialWeapon)
+        public PlayerModel(Vector2 initialPosition, Weapon initialWeapon, float scaleFactor)
         {
             Position = initialPosition;
-            Velocity = Vector2.Zero;
-            Health = MaxHealth;
-            Weapon = initialWeapon;
-            this.screenWidth = screenWidth;
-            this.screenHeight = screenHeight;
-            _isFacingRight = false; // Le joueur regarde par dÃ©faut Ã  gauche
-            IsOnGround = false;
-            isReloading = false;
-            lastShotTime = 0f;
+            _weapon = initialWeapon;
+            this.scaleFactor = scaleFactor;
         }
 
-        public void Update(GameTime gameTime, InputManager inputManager, TiledMap map)
+        public void TakeDamage(int damage)
         {
-            ApplyGravity(gameTime);
-            HandleMovement(inputManager);
-            CheckCollisions(map);
-            UpdatePosition(gameTime);
-            UpdateBullets(gameTime);
-
-            // Gestion du tir
-            if (inputManager.IsShootPressed() && gameTime.TotalGameTime.TotalSeconds - lastShotTime >= 1 / Weapon.FireRate)
+            Health -= damage;
+            if (Health <= 0)
             {
-                Shoot();
-                lastShotTime = (float)gameTime.TotalGameTime.TotalSeconds;
-            }
-
-            // Gestion du rechargement
-            if (inputManager.IsReloadPressed())
-            {
-                StartReloading(gameTime);
-            }
-
-            // Gestion de la capacitÃ© spÃ©ciale
-            if (inputManager.IsSpecialAbilityPressed())
-            {
-                Weapon.ActivateSpecialAbility();
+                Die();
             }
         }
 
-        private void ApplyGravity(GameTime gameTime)
+        private void Die()
         {
+            Console.WriteLine("Player is dead.");
+            // Actions supplémentaires lors de la mort du joueur
+        }
+
+        public void Move(Vector2 direction, GameTime gameTime, TiledMap tiledMap)
+        {
+            if (direction.X != 0)
+            {
+                direction.Normalize();
+                Position += new Vector2(direction.X * speed * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
+                IsFacingRight = direction.X > 0; // Met à jour l'orientation
+            }
+
+            // Appliquer la gravité
             if (!IsOnGround)
             {
                 Velocity = new Vector2(Velocity.X, Velocity.Y + Gravity * (float)gameTime.ElapsedGameTime.TotalSeconds);
             }
+
+            // Mise à jour de la position
+            Position += new Vector2(0, Velocity.Y);
+
+            // Gérer les collisions avec les tuiles
+            HandleCollisions(tiledMap);
         }
 
-        private void HandleMovement(InputManager inputManager)
+        private void HandleCollisions(TiledMap tiledMap)
         {
-            Vector2 movement = inputManager.GetMovement();
-            Velocity = new Vector2(movement.X * 300, Velocity.Y);
+            IsOnGround = false; // Réinitialiser l'état du sol
+            Rectangle playerRect = GetPlayerRectangle();
 
-            // Changer l'orientation en fonction des touches A et D
-            if (movement.X > 0) _isFacingRight = true;
-            else if (movement.X < 0) _isFacingRight = false;
-
-            // Gestion du saut
-            if (inputManager.IsJumpPressed() && IsOnGround)
-            {
-                Velocity = new Vector2(Velocity.X, JumpStrength);
-                IsOnGround = false;
-            }
-        }
-
-        private void CheckCollisions(TiledMap map)
-        {
-            IsOnGround = false;
-            Rectangle playerRect = new Rectangle((int)Position.X, (int)Position.Y, 64, 128);
-
-            foreach (var layer in map.TileLayers)
+            foreach (var layer in tiledMap.TileLayers)
             {
                 foreach (var tile in layer.Tiles)
                 {
-                    if (tile.GlobalIdentifier != 0)
+                    if (tile.GlobalIdentifier > 0) // Si la tuile est solide
                     {
-                        Rectangle tileRect = new Rectangle(tile.X * map.TileWidth, tile.Y * map.TileHeight, map.TileWidth, map.TileHeight);
+                        Rectangle tileRect = new Rectangle(
+                            tile.X * tiledMap.TileWidth,
+                            tile.Y * tiledMap.TileHeight,
+                            tiledMap.TileWidth,
+                            tiledMap.TileHeight
+                        );
 
-                        if (playerRect.Intersects(tileRect) && Velocity.Y > 0)
+                        if (playerRect.Intersects(tileRect))
                         {
-                            Position = new Vector2(Position.X, tileRect.Top - playerRect.Height);
-                            Velocity = new Vector2(Velocity.X, 0);
-                            IsOnGround = true;
-                            return;
+                            // Gestion des collisions en fonction de la direction du mouvement
+                            if (Velocity.Y > 0) // Collision en tombant
+                            {
+                                Position = new Vector2(Position.X, tileRect.Top - GetScaledHeight());
+                                IsOnGround = true; // Le joueur est maintenant au sol
+                                Velocity = Vector2.Zero; // Réinitialise la vélocité
+                            }
+                            else if (Velocity.Y < 0) // Collision en sautant
+                            {
+                                Position = new Vector2(Position.X, tileRect.Bottom);
+                                Velocity = new Vector2(Velocity.X, 0); // Annule la vélocité vers le haut
+                            }
+
+                            // Collision sur les côtés
+                            if (Position.X < tileRect.Left)
+                            {
+                                Position = new Vector2(tileRect.Left - GetScaledWidth(), Position.Y);
+                            }
+                            else if (Position.X > tileRect.Right)
+                            {
+                                Position = new Vector2(tileRect.Right, Position.Y);
+                            }
                         }
                     }
                 }
             }
         }
 
-        private void UpdatePosition(GameTime gameTime)
+        public Rectangle GetPlayerRectangle()
         {
-            Position += Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (Position.X < 0) Position = new Vector2(0, Position.Y);
-            if (Position.X > screenWidth - 64) Position = new Vector2(screenWidth - 64, Position.Y);
-            if (Position.Y > screenHeight - 128) Position = new Vector2(Position.X, screenHeight - 128);
+            return new Rectangle((int)Position.X, (int)Position.Y, GetScaledWidth(), GetScaledHeight());
         }
 
-        // MÃ©thode pour tirer avec l'arme Ã©quipÃ©e
-        public void Shoot()
+        private int GetScaledWidth()
         {
-            Vector2 direction = _isFacingRight ? Vector2.UnitX : -Vector2.UnitX;
-            Vector2 bulletVelocity = direction * Weapon.Speed;
-            Bullet bullet = new Bullet(Position, bulletVelocity, Weapon.Damage, _isFacingRight, Weapon.WeaponOffset, Weapon.Speed);
-            bullets.Add(bullet);
+            return (int)(BaseWidth * scaleFactor);
         }
 
-        public List<Bullet> GetBullets()
+        private int GetScaledHeight()
         {
-            return bullets;
-        }
-        // DÃ©marrer le rechargement
-        private void StartReloading(GameTime gameTime)
-        {
-            if (!isReloading)
-            {
-                isReloading = true;
-                Task.Delay((int)(Weapon.ReloadTime * 1000)).ContinueWith(_ => FinishReloading(gameTime));
-            }
-        }
-
-        private void FinishReloading(GameTime gameTime)
-        {
-            Weapon.Reload(gameTime);
-            isReloading = false;
-        }
-
-        private void UpdateBullets(GameTime gameTime)
-        {
-            for (int i = bullets.Count - 1; i >= 0; i--)
-            {
-                bullets[i].Update(gameTime);
-
-                if (bullets[i].IsOffScreen(screenWidth, screenHeight))
-                {
-                    bullets.RemoveAt(i);
-                }
-            }
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            SpriteEffects effect = _isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            spriteBatch.Draw(Weapon.Texture, Position, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
-
-            foreach (var bullet in bullets)
-            {
-                bullet.Draw(spriteBatch);
-            }
-        }
-
-        public void ChangeWeapon(Weapon newWeapon)
-        {
-            Weapon = newWeapon;
-            isReloading = false;
-        }
-
-        public void TakeDamage(int damage)
-        {
-            Health -= Weapon.Damage;
-            if (Health <= 0)
-            {
-                Health = 0;
-                Die();
-            }
-        }
-
-        private async void Die()
-        {
-            Console.WriteLine("Player is dead.");
-            await Task.Delay(10000);
-            Environment.Exit(0);
+            return (int)(BaseHeight * scaleFactor);
         }
     }
 }

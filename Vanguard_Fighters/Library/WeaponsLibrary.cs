@@ -2,9 +2,9 @@
 using MyGame.Models;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.Content;
+using Microsoft.Xna.Framework.Content;
+using Vanguard_Fighters.Library;
 
 namespace MyGame.Library
 {
@@ -12,16 +12,27 @@ namespace MyGame.Library
     {
         private Dictionary<int, WeaponStats> weapons;
         private Texture2D bulletTexture;
+        private GraphicsDevice graphicsDevice;
+        private ContentManager contentManager;
 
         public WeaponsLibrary(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
+            this.contentManager = contentManager ?? throw new ArgumentNullException(nameof(contentManager), "ContentManager cannot be null.");
+            this.graphicsDevice = graphicsDevice ?? throw new ArgumentNullException(nameof(graphicsDevice), "GraphicsDevice cannot be null.");
+
+            weapons = new Dictionary<int, WeaponStats>();
+            LoadWeapons();
+        }
+
+        private void LoadWeapons()
+        {
             weapons = new Dictionary<int, WeaponStats>();
 
-            
+            // Ajout des armes avec des textures chargées dynamiquement
             weapons.Add(1, new WeaponStats(
                 name: "Advanced Assault Rifle",
-                damage: 35,
-                fireCooldown: 10f,
+                damage: 15,
+                fireCooldown: 0.4f,
                 maxAmmo: 30,
                 clipSize: 3,
                 range: 800f,
@@ -32,8 +43,8 @@ namespace MyGame.Library
 
             weapons.Add(2, new WeaponStats(
                 name: "Compact Sidearm",
-                damage: 25,
-                fireCooldown: 5f,
+                damage: 10,
+                fireCooldown: 0.8f,
                 maxAmmo: 48,
                 clipSize: 12,
                 range: 400f,
@@ -44,8 +55,8 @@ namespace MyGame.Library
 
             weapons.Add(3, new WeaponStats(
                 name: "Energy Rifle",
-                damage: 40,
-                fireCooldown: 6f,
+                damage: 18,
+                fireCooldown: 0.6f,
                 maxAmmo: 80,
                 clipSize: 20,
                 range: 1000f,
@@ -56,8 +67,8 @@ namespace MyGame.Library
 
             weapons.Add(4, new WeaponStats(
                 name: "Futuristic Pistol",
-                damage: 30,
-                fireCooldown: 4f,
+                damage: 12,
+                fireCooldown: 1.5f,
                 maxAmmo: 40,
                 clipSize: 10,
                 range: 500f,
@@ -68,8 +79,8 @@ namespace MyGame.Library
 
             weapons.Add(5, new WeaponStats(
                 name: "Ion Rifle",
-                damage: 45,
-                fireCooldown: 7f,
+                damage: 20,
+                fireCooldown: 0.9f,
                 maxAmmo: 100,
                 clipSize: 25,
                 range: 900f,
@@ -80,8 +91,8 @@ namespace MyGame.Library
 
             weapons.Add(6, new WeaponStats(
                 name: "Plasma Blaster",
-                damage: 60,
-                fireCooldown: 2f,
+                damage: 17,
+                fireCooldown: 1.0f,
                 maxAmmo: 32,
                 clipSize: 8,
                 range: 600f,
@@ -92,8 +103,8 @@ namespace MyGame.Library
 
             weapons.Add(7, new WeaponStats(
                 name: "Sci-Fi Shotgun",
-                damage: 80,
-                fireCooldown: 1.5f,
+                damage: 25,
+                fireCooldown: 1.8f,
                 maxAmmo: 24,
                 clipSize: 6,
                 range: 300f,
@@ -104,7 +115,7 @@ namespace MyGame.Library
 
             weapons.Add(8, new WeaponStats(
                 name: "Stealth Handgun",
-                damage: 20,
+                damage: 8,
                 fireCooldown: 3f,
                 maxAmmo: 36,
                 clipSize: 9,
@@ -116,8 +127,8 @@ namespace MyGame.Library
 
             weapons.Add(9, new WeaponStats(
                 name: "Tactical Pistol",
-                damage: 35,
-                fireCooldown: 3f,
+                damage: 10,
+                fireCooldown: 0.5f,
                 maxAmmo: 40,
                 clipSize: 10,
                 range: 600f,
@@ -126,8 +137,9 @@ namespace MyGame.Library
                 texture: contentManager.Load<Texture2D>("Weapons/Tactical_Pistol"),
                 speed: 600f));
 
+            // Initialisation de la texture pour les balles
             bulletTexture = new Texture2D(graphicsDevice, 1, 1);
-            bulletTexture.SetData(new[] {Color.Red});
+            bulletTexture.SetData(new[] { Color.Red });
         }
 
         public WeaponStats GetWeapon(int index)
@@ -138,20 +150,5 @@ namespace MyGame.Library
             }
             throw new KeyNotFoundException($"Weapon with index {index} does not exist.");
         }
-
-        public void TestWeapons(GameTime gameTime)
-        {
-            foreach (var weaponStats in weapons.Values)
-            {
-                Vector2 weaponOffset = new Vector2(30, 10); // Par exemple, un offset pour le test
-                Weapon weapon = new Weapon(weaponStats, weaponOffset);
-
-                Vector2 direction = new Vector2(1, 0); // Direction vers la droite
-                weapon.Shoot(new Vector2(0, 0), direction, gameTime, bulletTexture);
-                weapon.Reload(gameTime);
-            }
-        }
-
-
     }
 }

@@ -1,51 +1,80 @@
-
-using Autofac;
-using MyGame.Models;
-using MyGame.Library;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MyGame.Services;
+using MyGame.Models;
+using System.Collections.Generic;
 
 namespace MyGame.View
 {
     public class WeaponView
     {
-        public Texture2D WeaponTexture { get; private set; }
-        public Weapon Weapon { get => _weapon; set => _weapon = value; }
-        public Vector2 Position { get => _position; set => _position = value; }
-        public bool IsFacingRight { get => _isFacingRight; set => _isFacingRight = value; }
-        public float Scale { get => _scale; set => _scale = value; }
-        public Vector2 WeaponOffset { get => _weaponOffset; set => _weaponOffset = value; }
-        
-        
-        private InputManager inputManager;
-        private Weapon _weapon;
-        private Vector2 _position;
-        private bool _isFacingRight;
-        private float _scale;
-        private Vector2 _weaponOffset = new Vector2(0, 20);
+        private Texture2D weaponTexture;
+        private Texture2D bulletTexture;
+        private List<Vector2> bulletsPositions;
+        private bool isFacingRight;
 
-        
-
-        public WeaponView(Weapon weapon, Vector2 initialPostition, bool isFacingRight, float scale, Vector2 weaponOffset)
+        public WeaponView(Texture2D weaponTexture, Texture2D bulletTexture)
         {
-            this.Weapon = weapon;
-            this.Position = initialPostition;
-            this.IsFacingRight = isFacingRight;
-            this.Scale = scale ;
-            this.WeaponOffset = weaponOffset;
+            this.weaponTexture = weaponTexture;
+            this.bulletTexture = bulletTexture;
+            bulletsPositions = new List<Vector2>();
+            isFacingRight = true;
         }
 
-        public void Update(Vector2 Position, bool isFacingRight)
+        // Méthode pour changer l'orientation de l'arme en fonction de la direction du joueur
+        public void SetDirection(bool facingRight)
         {
-            this.Position = Position + WeaponOffset;
-            this.IsFacingRight = isFacingRight;
+            isFacingRight = facingRight;
         }
 
-            public void Draw(SpriteBatch spriteBatch)
+        // Ajoute une balle à la liste avec la position de départ
+        public void AddBullet(Vector2 position)
         {
-            SpriteEffects spriteEffect = IsFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            spriteBatch.Draw(Weapon.Texture, Position, null, Color.White, 0f, Vector2.Zero,0.130f, spriteEffect, 0f);
+            bulletsPositions.Add(position);
+        }
+
+        // Met à jour la position des balles
+        public void UpdateBullets(GameTime gameTime, float bulletSpeed, float scaleFactor)
+        {
+            for (int i = bulletsPositions.Count - 1; i >= 0; i--)
+            {
+                bulletsPositions[i] += new Vector2(bulletSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds * (isFacingRight ? 1 : -1) * scaleFactor, 0);
+
+                // Retire les balles qui sortent de l'écran
+                if (bulletsPositions[i].X > 1920 || bulletsPositions[i].X < 0)
+                    bulletsPositions.RemoveAt(i);
+            }
+        }
+
+        // Dessine l'arme du joueur ou de l'ennemi
+        public void DrawWeapon(SpriteBatch spriteBatch, Vector2 position, float scaleFactor)
+        {
+            if (weaponTexture == null) return;
+
+            SpriteEffects spriteEffect = isFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            Rectangle destinationRectangle = new Rectangle(
+                (int)(position.X * scaleFactor),
+                (int)(position.Y * scaleFactor),
+                (int)(weaponTexture.Width * scaleFactor),
+                (int)(weaponTexture.Height * scaleFactor)
+            );
+
+            spriteBatch.Draw(weaponTexture, destinationRectangle, null, Color.White, 0f, Vector2.Zero, spriteEffect, 0f);
+        }
+
+        // Dessine les balles sur l'écran
+        public void DrawBullets(SpriteBatch spriteBatch, float scaleFactor)
+        {
+            foreach (var bulletPos in bulletsPositions)
+            {
+                Rectangle bulletRectangle = new Rectangle(
+                    (int)(bulletPos.X * scaleFactor),
+                    (int)(bulletPos.Y * scaleFactor),
+                    (int)(10 * scaleFactor), // Taille de la balle ajustée par le scaleFactor
+                    (int)(10 * scaleFactor)
+                );
+
+                spriteBatch.Draw(bulletTexture, bulletRectangle, Color.White);
+            }
         }
     }
 }
