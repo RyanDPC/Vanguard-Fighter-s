@@ -48,7 +48,7 @@ namespace MyGame.View
 
             SpriteEffects spriteEffects = playerModel.IsFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-            spriteBatch.Draw(_weaponStats.WeaponTexture,weaponPosition,weaponDestinationRectangle, Color.White,roation ,0f, Vector2.Zero, spriteEffects, 0f);
+            spriteBatch.Draw(_weaponStats.WeaponTexture,weaponPosition,weaponDestinationRectangle, Color.White,,0f, Vector2.Zero, spriteEffects, 0f);
         }
     }
 }

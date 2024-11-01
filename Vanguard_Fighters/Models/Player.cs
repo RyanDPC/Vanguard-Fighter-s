@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
 using MyGame.Library;
 using System;
+using System.Drawing;
 
 namespace MyGame.Models
 {
@@ -19,6 +20,7 @@ namespace MyGame.Models
         private const int BaseWidth = 68; // Largeur du joueur
         private const int BaseHeight = 128; // Hauteur du joueur
         private float scaleFactor; // Facteur d'échelle
+        private Weapon _weapon;
         private const float Gravity = 980f;
 
         public PlayerModel(Vector2 initialPosition, Weapon initialWeapon, float scaleFactor)
@@ -36,7 +38,10 @@ namespace MyGame.Models
                 Die();
             }
         }
+        public void Shoot()
+        {
 
+        }
         private void Die()
         {
             Console.WriteLine("Player is dead.");

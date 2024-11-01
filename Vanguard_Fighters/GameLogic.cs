@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using MyGame.Models;
+using MyGame.View;
 using MyGame.Services;
 using MyGame.Library;
 using MonoGame.Extended.Tiled;
@@ -17,12 +18,13 @@ namespace Vanguard_Fighters
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private TiledMapRenderer _mapRenderer;
-        private MyGame.Models.Player playerModel;
-        private MyGame.View.Player playerView;
+        private PlayerModel playerModel;
+        private PlayerView playerView;
         private EnemyLibrary enemyLibrary;
         private Weapon weapon;
         private WeaponsLibrary weaponsLibrary;
         private InputManager inputManager;
+        private Bullet bullet;
         private List<Bullet> bullets;
         private List<TiledMap> maps;
         private List<Texture2D> backgrounds;
@@ -104,14 +106,14 @@ namespace Vanguard_Fighters
                 _graphics.PreferredBackBufferHeight / 2
             );
 
-            playerModel = new MyGame.Models.Player(playerInitialPosition * scaleFactor, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight, weapon, weaponsLibrary);
-            playerView = new MyGame.View.Player(skins, weapon, playerInitialPosition, true, scaleFactor, weaponOffset * scaleFactor);
+            playerModel = new PlayerModel(playerInitialPosition * scaleFactor, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight, weapon, weaponsLibrary);
+            playerView = new PlayerView(skins, weapon, playerInitialPosition, true, scaleFactor, weaponOffset * scaleFactor);
         }
 
         private void LoadEnemies(ContentManager content)
         {
             Texture2D enemyTexture = content.Load<Texture2D>("Players/WukongEntier");
-            enemyLibrary = new EnemyLibrary(enemyTexture);
+            enemyLibrary = new EnemyLibrary(enemyTexture,bullet. );
 
             // Positionner les ennemis en tenant compte de l'échelle
             enemyLibrary.AddEnemy(new Vector2(500, 100) * scaleFactor);
